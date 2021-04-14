@@ -1,0 +1,5 @@
+#include "lib/date_time_lib.h"
+
+#define MAX_EVENTS_PER_DAY 16u
+#define TIMESPANS_PER_HOUR 4u
+#define TIMESPAN_LEN_IN_MINS MINUTES_PER_HOUR / TIMESPANS_PER_HOUR
