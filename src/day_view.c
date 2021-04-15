@@ -10,31 +10,45 @@
 #define TIMESLOT_TIME_CHAR_SIZE 5u // characters are 5pixels tall
 #define EVENT_WIDTH 20u // fit 5 events into width
 
+#define MAX_HEADER_LEN 20
+#define HEADER_X_POS 5
+#define HEADER_Y_POS 5
+#define HEADER_BODY_SEP_Y_POS 10
+
 DayView_t* DayViewSingleton = null;
 
-void DrawHeader() {
-		DrawString();
-}
+void DrawHeader(Date_t* date) {
+		RgbColor c = { 255, 0, 0 };
+		char* headerStr = (char*) calloc(MAX_HEADER_LEN, sizeof(char));
+		sprintf(headerStr, "%.2d/%.2d/%.4d", date->day, date->month, date->year);
+		DrawString(HEADER_X_POS, HEADER_Y_POS, headerStr, c);
 
-void DrawTimeslots() {
-
+		DrawHLine(0, HEADER_BODY_SEP_Y_POS, DISPLAY_MAX_X, c);
 }
 
 ScheduledEvent_t* FindCurrentlyVisibleEvents() {
-   // return new list of events ordered by time, then by preexisting order
+		// return new list of events ordered by time, then by preexisting order
+		return null;
 }
 
 void DrawEvents() {
-   
+
 }
 
-void DayViewDraw(void)
+void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, ScheduledEvent_t* events) {
+		// probably want to draw 5-6 timeslots
+		// need to calculate the times of these other timeslots
+		// need to shade the currently selected timeslot
+		DrawEvents();
+}
+
+void DayViewDraw(View_t* self)
 {
-   // Timeslot_t *Timeslots = 
-   DrawHeader(); // can probably be moved to a common lib
-   DrawTimeslots();
-   // DrawCurrentTime();
-   DrawEvents();
+		DayView_t* selfView = (DayView_t*)self;
+   DrawHeader(selfView->GetDate(selfView)); // can probably be moved to a common lib
+	 // DrawCurrentTime();
+   DrawTimeslotsAndEvents(selfView->GetCurrTimeslot(selfView), selfView->_events);
+   
 }
 
 void ImplSetDate(DayView_t *self, Date_t* date) {
@@ -44,7 +58,7 @@ void ImplSetDate(DayView_t *self, Date_t* date) {
 }
 
 Date_t* ImplGetDate(DayView_t *self) {
-   return null;
+   return &self->_date;
 }
 
 void ImplSelectNextTimeslot(DayView_t *self) {

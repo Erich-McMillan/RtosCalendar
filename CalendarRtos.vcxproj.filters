@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\day_view.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\month_view.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,13 +33,16 @@
     <ClCompile Include="src\lib\calendar\model.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\modelview_controller\controller.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\date_time\date_time_lib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="winhost\host.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\modelview_controller\modelview_controller.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\day_view.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

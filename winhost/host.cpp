@@ -5,6 +5,8 @@
 using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 #include <lib/graphics_lib.h>
+#include <lib/view_lib.h>
+#include <obj/day_view.h>
 
 HDC          globalhdc;
 
@@ -121,6 +123,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 		WPARAM wParam, LPARAM lParam)
 {
 		PAINTSTRUCT  ps;
+		View_t* view;
+		Date_t date = {4, April, 2021 };
 		char *testStr = "teststr";
 
 		switch (message)
@@ -131,14 +135,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 				// call back into graphics_lib functions defined here
 				// hdc must be set to a global for this function so that
 				// the graphics functions can access it
-				RgbColor c;
-				c.red = 0;
-				c.green = 255;
-				c.blue = 0;
-				DrawHLine(0, 0, 128, c);
-				DrawVLine(0, 0, 128, c);
-				FillRect(40, 40, 30, 88, c);
-				DrawString(100, 50, testStr, c);
+				view = GetDayView();
+				((DayView_t*)view)->SetDate((DayView_t*)view, &date);
+				view->Draw(view);
 				EndPaint(hWnd, &ps);
 				return 0;
 		case WM_DESTROY:

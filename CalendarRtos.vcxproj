@@ -103,15 +103,21 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\School\ECE6336\FinalProject\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <Link>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\day_view.c" />
+    <ClCompile Include="src\day_view.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="src\lib\calendar\controller.c" />
     <ClCompile Include="src\lib\calendar\model.c" />
     <ClCompile Include="src\lib\date_time\date_time_lib.c" />
-    <ClCompile Include="src\lib\modelview_controller\controller.c" />
+    <ClCompile Include="src\lib\modelview_controller\modelview_controller.c" />
     <ClCompile Include="src\month_view.c" />
     <ClCompile Include="src\scheduler_view.c" />
     <ClCompile Include="src\user_interface.c" />

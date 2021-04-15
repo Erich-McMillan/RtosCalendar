@@ -1,13 +1,13 @@
 #pragma once
 
 #include "tm4c_defines.h"
-#include "obj/view.h"
-#include "lib/date_time_lib.h"
-#include "obj/scheduled_event.h"
+#include <obj/view.h>
+#include <lib/date_time_lib.h>
+#include <obj/scheduled_event.h>
 
 typedef struct _DayView_t DayView_t;
 
-typedef void (*SetDate) (DayView_t *self, Date_t date);
+typedef void (*SetDate) (DayView_t *self, Date_t* date);
 typedef Date_t* (*GetDate) (DayView_t *self);
 typedef void (*SelectNextTimeslot) (DayView_t *self);
 typedef void (*SelectPrevTimeslot) (DayView_t *self);

@@ -11,7 +11,9 @@
 //    UpdateViewData UpdateView;
 // } ViewController_t;
 
-typedef void (*DrawView) (void);
+typedef struct _View_t View_t;
+
+typedef void (*DrawView) (View_t* self);
 
 // abstract type
 typedef struct _View_t {
