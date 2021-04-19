@@ -19,3 +19,6 @@ void FillRect(int x, int y, int w, int h, RgbColor color);
 
 // draw string
 void DrawString(int x, int y, char *pt, RgbColor textColor);
+
+// fill screen one color
+void FillScreen(RgbColor fillColor);

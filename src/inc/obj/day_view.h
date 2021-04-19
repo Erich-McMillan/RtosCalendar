@@ -23,10 +23,12 @@ typedef struct _DayView_t {
    Date_t _date;
    Timeslot_t _selectedTimeslot;
    uint8_t _numEvents;
+	 uint8_t _newEventsAdded;
    int8_t _selectedEvent;
    ScheduledEvent_t* _events;
    SetDate SetDate;
    GetDate GetDate;
+	 uint8_t _updatedTimeslot;
    SelectNextTimeslot SelectNextTimeslot;
    SelectPrevTimeslot SelectPrevTimeslot;
    SetCurrTimeslot SetCurrTimeslot;

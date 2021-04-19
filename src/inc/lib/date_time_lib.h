@@ -36,3 +36,5 @@ typedef struct _Timeslot_t {
 } Timeslot_t;
 
 uint8_t DoTimeslotsOverlap(Timeslot_t* a, Timeslot_t* b);
+
+uint16_t TimeslotStartSplitMins(Timeslot_t* a, Timeslot_t* b);
