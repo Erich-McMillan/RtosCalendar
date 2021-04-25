@@ -29,3 +29,8 @@ uint16_t TimeslotStartSplitMins(Timeslot_t* a, Timeslot_t* b) {
 
 		return (a_min_since_midnight > b_start_mins_since_midnight) ? a_min_since_midnight - b_start_mins_since_midnight : b_start_mins_since_midnight - a_min_since_midnight;
 }
+
+Weekday GetDayOfWeek(Date_t* Date) {
+		// TODO: this should actually calculate the day of week
+		return Monday;
+}

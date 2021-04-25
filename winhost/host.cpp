@@ -7,12 +7,19 @@ using namespace Gdiplus;
 #include <lib/graphics_lib.h>
 #include <lib/view_lib.h>
 #include <obj/day_view.h>
+#include <obj/month_view.h>
 #include <lib/interface_lib.h>
 
 HDC          globalhdc;
 uint8_t      globalPendingButton = 0u;
+uint8_t      DayViewSelected = 0u;
+uint8_t      MonthViewSelected = 1u;
 
 #define GRAPHICS_SCALING 4
+
+RgbColor BACKGROUND_COLOR = { 255, 255, 255 }; // white
+RgbColor TEXT_COLOR = { 0, 0, 0 }; // black
+RgbColor LINE_COLOR = { 224, 224, 224 }; // grey
 
 VOID OnPaint()
 {
@@ -120,6 +127,14 @@ void DayViewSetup() {
 		((DayView_t*)view)->SetDate((DayView_t*)view, &date);
 		((DayView_t*)view)->SetEvents((DayView_t*)view, events, 8);
 }
+
+void MonthViewSetup() {
+		View_t* view;
+		Date_t startDate = { 1, April, 2021 };
+		view = GetMonthView();
+		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate, 28);
+}
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
@@ -132,6 +147,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 
 		// Initialize calendar
 		DayViewSetup();
+		MonthViewSetup();
 
 		// Initialize GDI+.
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -178,21 +194,55 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 void DayViewController() {
 		DayView_t* view;
 
-		view = (DayView_t*) GetDayView();
-		if (IsUpButtonPressed()) {
-				view->SelectPrevTimeslot(view);
+		if (DayViewSelected)
+		{
+				view = (DayView_t*)GetDayView();
+				if (IsUpButtonPressed()) {
+						view->SelectPrevTimeslot(view);
+				}
+				if (IsDownButtonPressed()) {
+						view->SelectNextTimeslot(view);
+				}
+				if (IsLeftButtonPressed()) {
+						view->SelectPrevEvent(view);
+				}
+				if (IsRightButtonPressed()) {
+						view->SelectNextEvent(view);
+				}
+				if (IsBackButtonPressed()) {
+						DayViewSelected = 0;
+						MonthViewSelected = 1;
+				}
+
+				((View_t*)view)->Draw((View_t*)view);
 		}
-		if (IsDownButtonPressed()) {
-				view->SelectNextTimeslot(view);
+}
+
+void MonthViewController() {
+		MonthView_t* view;
+
+		if (MonthViewSelected)
+		{
+				view = (MonthView_t*)GetMonthView();
+				if (IsUpButtonPressed()) {
+						view->SelectPrevWeek(view);
+				}
+				if (IsDownButtonPressed()) {
+						view->SelectNextWeek(view);
+				}
+				if (IsLeftButtonPressed()) {
+						view->SelectPrevDay(view);
+				}
+				if (IsRightButtonPressed()) {
+						view->SelectNextDay(view);
+				}
+				if (IsSelectButtonPressed()) {
+						DayViewSelected = 1;
+						MonthViewSelected = 0u;
+				}
+
+				((View_t*)view)->Draw((View_t*)view);
 		}
-		if (IsLeftButtonPressed()) {
-				view->SelectPrevEvent(view);
-		}
-		if (IsRightButtonPressed()) {
-				view->SelectNextEvent(view);
-		}
-		
-		((View_t*) view)->Draw((View_t*)view);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
@@ -211,6 +261,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						// hdc must be set to a global for this function so that
 						// the graphics functions can access it
 						DayViewController();
+						MonthViewController();
 						EndPaint(hWnd, &ps);
 						return 0;
 				case WM_KEYDOWN:
@@ -239,6 +290,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						}
 						if (globalPendingButton != 0) {
 								globalhdc = GetDC(hWnd);
+								MonthViewController();
 								DayViewController();
 								ReleaseDC(hWnd, globalhdc);
 								globalPendingButton = 0; // reset to unpressed after handled by listeners

@@ -18,6 +18,16 @@ typedef enum _Month {
    December
 } Month;
 
+typedef enum _Weekday {
+		Sunday = 0,
+		Monday,
+		Tuesday,
+		Wednesday,
+		Thursday,
+		Friday,
+		Saturday
+} Weekday;
+
 typedef struct _Date_t {
    uint8_t day;
    Month month;
@@ -38,3 +48,5 @@ typedef struct _Timeslot_t {
 uint8_t DoTimeslotsOverlap(Timeslot_t* a, Timeslot_t* b);
 
 uint16_t TimeslotStartSplitMins(Timeslot_t* a, Timeslot_t* b);
+
+Weekday GetDayOfWeek(Date_t* Date);

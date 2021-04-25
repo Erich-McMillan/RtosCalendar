@@ -4,25 +4,18 @@
 #include <lib/view_lib.h>
 #include <obj/day_view.h>
 #include <lib/graphics_lib.h>
-#include <lib/interface_lib.h>
 
-#define HEADER_HEIGHT 13u
 #define NUM_TIMESLOTS 5u
 #define TIMESLOT_HEIGHT ((DISPLAY_MAX_Y-HEADER_HEIGHT) / NUM_TIMESLOTS)
 #define TIMESLOT_TIME_CHAR_SIZE 5u // characters are 5pixels tall
 #define TIMESLOT_OFFSET 17
 
-#define MAX_HEADER_CHAR_LEN 20
-#define LEFT_CHAR_OFFSET_X_POS 2
-#define TOP_CHAR_OFFSET_Y_POS 2
 #define HEADER_BODY_SEP_Y_POS 10
 
 #define EVENT_X_OFFSET 2
 #define EVENT_Y_OFFSET 2
 #define EVENT_WIDTH 18
 
-RgbColor TEXT_COLOR = { 0, 0, 0 }; // black
-RgbColor LINE_COLOR = { 224, 224, 224 }; // grey
 #define NUM_EVENT_COLORS 6
 RgbColor EVENT_BASE_COLORS[NUM_EVENT_COLORS] = {
 		{ 102, 255, 178 },
@@ -40,7 +33,6 @@ RgbColor EVENT_SELECTED_COLORS[NUM_EVENT_COLORS] = {
 		{ 255, 204,  255 },
 		{ 255, 204,  255 }
 };
-RgbColor BACKGROUND_COLOR = { 255, 255, 255 }; // white
 
 DayView_t* DayViewSingleton = null;
 

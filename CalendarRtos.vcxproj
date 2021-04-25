@@ -135,6 +135,7 @@
     <ClInclude Include="src\inc\lib\modelview_controller_lib.h" />
     <ClInclude Include="src\inc\lib\view_lib.h" />
     <ClInclude Include="src\inc\obj\day_view.h" />
+    <ClInclude Include="src\inc\obj\month_view.h" />
     <ClInclude Include="src\inc\obj\scheduled_event.h" />
     <ClInclude Include="src\inc\obj\view.h" />
     <ClInclude Include="src\inc\serialize.h" />
