@@ -8,12 +8,14 @@ using namespace Gdiplus;
 #include <lib/view_lib.h>
 #include <obj/day_view.h>
 #include <obj/month_view.h>
+#include <obj/scheduler_view.h>
 #include <lib/interface_lib.h>
 
 HDC          globalhdc;
 uint8_t      globalPendingButton = 0u;
 uint8_t      DayViewSelected = 0u;
-uint8_t      MonthViewSelected = 1u;
+uint8_t      MonthViewSelected = 0u;
+uint8_t      SchedulerViewSelected = 1u;
 
 #define GRAPHICS_SCALING 4
 
@@ -135,6 +137,14 @@ void MonthViewSetup() {
 		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate, 28);
 }
 
+void SchedulerViewSetup() {
+		View_t* view;
+		static Date_t date = { 4, April, 2021 };
+		static Timeslot_t timeslot = { 8, 15, 30 };
+		view = GetSchedulerView();
+		((SchedulerView_t*)view)->SetEventBaseInfo((SchedulerView_t*)view, &date, &timeslot);
+}
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
@@ -148,6 +158,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 		// Initialize calendar
 		DayViewSetup();
 		MonthViewSetup();
+		SchedulerViewSetup();
 
 		// Initialize GDI+.
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -245,6 +256,35 @@ void MonthViewController() {
 		}
 }
 
+void SchedulerViewController() {
+		SchedulerView_t* view;
+
+		if (SchedulerViewSelected)
+		{
+				view = (SchedulerView_t*)GetSchedulerView();
+				if (IsUpButtonPressed()) {
+						view->MoveFocusUp(view);
+				}
+				if (IsDownButtonPressed()) {
+						view->MoveFocusDown(view);
+				}
+				if (IsLeftButtonPressed()) {
+						view->MoveFocusLeft(view);
+				}
+				if (IsRightButtonPressed()) {
+						view->MoveFocusRight(view);
+				}
+				if (IsSelectButtonPressed()) {
+						view->SelectCurrElement(view);
+				}
+				if (IsBackButtonPressed()) {
+						view->UnselectCurrElement(view);
+				}
+
+				((View_t*)view)->Draw((View_t*)view);
+		}
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 		WPARAM wParam, LPARAM lParam)
 {
@@ -260,6 +300,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						// call back into graphics_lib functions defined here
 						// hdc must be set to a global for this function so that
 						// the graphics functions can access it
+						SchedulerViewController();
 						DayViewController();
 						MonthViewController();
 						EndPaint(hWnd, &ps);
@@ -290,6 +331,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						}
 						if (globalPendingButton != 0) {
 								globalhdc = GetDC(hWnd);
+								SchedulerViewController();
 								MonthViewController();
 								DayViewController();
 								ReleaseDC(hWnd, globalhdc);

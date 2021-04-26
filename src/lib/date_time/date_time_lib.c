@@ -34,3 +34,33 @@ Weekday GetDayOfWeek(Date_t* Date) {
 		// TODO: this should actually calculate the day of week
 		return Monday;
 }
+
+void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd) {
+		uint8_t hoursToAdd = (a->minute + minsToAdd) / MINUTES_PER_HOUR;
+
+		uint8_t clockMins = (a->minute + minsToAdd) % MINUTES_PER_HOUR;
+		uint8_t clockHour = (a->hour + hoursToAdd) % HOURS_PER_DAY;
+
+		a->minute = clockMins;
+		a->hour = clockHour;
+}
+
+void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub) {
+		uint8_t hoursToSub = 0;
+
+		if (a->minute < minsToSub) {
+				hoursToSub++;
+				a->minute += MINUTES_PER_HOUR;
+		}
+
+		hoursToSub += minsToSub / MINUTES_PER_HOUR;
+
+		uint8_t clockMins = (a->minute - minsToSub);
+		if (hoursToSub > a->hour) {
+				a->hour += HOURS_PER_DAY;
+		}
+		uint8_t clockHour = (a->hour - hoursToSub) % HOURS_PER_DAY;
+
+		a->minute = clockMins;
+		a->hour = clockHour;
+}

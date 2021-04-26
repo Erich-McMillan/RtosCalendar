@@ -3,33 +3,43 @@
 #include "typedef.h"
 #include "tm4c_defines.h"
 #include <obj/view.h>
+#include <obj/scheduled_event.h>
 #include <lib/date_time_lib.h>
 
-typedef struct _MonthView_t MonthView_t;
+typedef struct _SchedulerView_t SchedulerView_t;
 
-typedef Date_t* (*MonthGetDate) (MonthView_t *self);
-typedef void(*SetMonthInfo) (MonthView_t* self, Date_t *startDate, uint8_t numDays);
-typedef void(*SelectNextWeek) (MonthView_t *self);
-typedef void(*SelectPrevWeek) (MonthView_t *self);
-typedef void(*SelectNextDay) (MonthView_t *self);
-typedef void(*SelectPrevDay) (MonthView_t *self);
+typedef enum _SchedulerViewState {
+		EDITING=0,
+		CANCELLED,
+		SAVED
+} SchedulerViewState;
 
-typedef struct _MonthView_t {
+typedef ScheduledEvent_t* (*CopyScheduledEvent) (SchedulerView_t *self);
+typedef void (*SetEventBaseInfo) (SchedulerView_t *self, Date_t* eventDate, Timeslot_t* timeslot);
+typedef SchedulerViewState (*GetSchedulerViewState) (SchedulerView_t *self);
+typedef void (*SelectCurrElement) (SchedulerView_t *self);
+typedef void (*UnselectCurrElement) (SchedulerView_t *self);
+typedef void (*MoveFocusUp) (SchedulerView_t *self);
+typedef void (*MoveFocusDown) (SchedulerView_t *self);
+typedef void (*MoveFocusLeft) (SchedulerView_t *self);
+typedef void (*MoveFocusRight) (SchedulerView_t *self);
+
+typedef struct _SchedulerView_t {
 		View_t _super;
-		Date_t _startDate;
-		uint8_t _numDays;
-		Weekday _startDateWeekday;
-		Date_t _selectedDate;
-		uint8_t _prevSelectedWeekDay;
-		uint8_t _prevSelectedWeek;
-		uint8_t _selectedWeekDay;
-		uint8_t _selectedWeek;
-		SetMonthInfo SetMonthInfo;
-		MonthGetDate GetSelectedDate;
-		SelectNextWeek SelectNextWeek;
-		SelectPrevWeek SelectPrevWeek;
-		SelectNextDay SelectNextDay;
-		SelectPrevDay SelectPrevDay;
-} MonthView_t;
+		ScheduledEvent_t _event;
+		uint8_t _prevObjId;
+		uint8_t _currObjId;
+		uint8_t _focused;
+		SchedulerViewState _state;
+		SetEventBaseInfo SetEventBaseInfo;
+		CopyScheduledEvent CopyScheduledEvent;
+		GetSchedulerViewState GetSchedulerViewState;
+		SelectCurrElement SelectCurrElement;
+		UnselectCurrElement UnselectCurrElement;
+		MoveFocusUp MoveFocusUp;
+		MoveFocusDown MoveFocusDown;
+		MoveFocusLeft MoveFocusLeft;
+		MoveFocusRight MoveFocusRight;
+} SchedulerView_t;
 
-void InitMonthView(MonthView_t* view);
+void InitSchedulerView(SchedulerView_t* view);

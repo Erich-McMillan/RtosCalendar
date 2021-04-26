@@ -50,3 +50,7 @@ uint8_t DoTimeslotsOverlap(Timeslot_t* a, Timeslot_t* b);
 uint16_t TimeslotStartSplitMins(Timeslot_t* a, Timeslot_t* b);
 
 Weekday GetDayOfWeek(Date_t* Date);
+
+void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd);
+
+void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -137,6 +137,7 @@
     <ClInclude Include="src\inc\obj\day_view.h" />
     <ClInclude Include="src\inc\obj\month_view.h" />
     <ClInclude Include="src\inc\obj\scheduled_event.h" />
+    <ClInclude Include="src\inc\obj\scheduler_view.h" />
     <ClInclude Include="src\inc\obj\view.h" />
     <ClInclude Include="src\inc\serialize.h" />
     <ClInclude Include="src\inc\typedef.h" />
