@@ -2,6 +2,7 @@
 
 #define HOURS_PER_DAY 24u
 #define MINUTES_PER_HOUR 60u
+#define NUM_DAYS_IN_WEEK 7u
 
 typedef enum _Month {
    January = 0u,
@@ -44,6 +45,8 @@ typedef struct _Timeslot_t {
    uint8_t minute;
    uint16_t durationMins;
 } Timeslot_t;
+
+Weekday GetDayOfWeek(Date_t* Date);
 
 uint8_t DoTimeslotsOverlap(Timeslot_t* a, Timeslot_t* b);
 

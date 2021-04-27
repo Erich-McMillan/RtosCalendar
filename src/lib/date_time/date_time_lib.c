@@ -2,6 +2,64 @@
 // #include <stdlib.h>
 #include <lib/date_time_lib.h>
 
+int days_in_month[]={31,28,31,30,31,30,31,31,30,31,30,31};
+
+#define TRUE    1
+#define FALSE   0
+
+// following code is ripped and modified from https://www.codingunit.com/how-to-make-a-calendar-in-c
+int determinedaycode(int year)
+{
+	int daycode;
+	int d1, d2, d3;
+	
+	d1 = (year - 1.)/ 4.0;
+	d2 = (year - 1.)/ 100.;
+	d3 = (year - 1.)/ 400.;
+	daycode = (year + d1 - d2 + d3) %7;
+	return daycode;
+}
+
+int IsLeapYear(int year)
+{
+	if(year % 4 != 0)
+	{
+		return FALSE;
+	}
+	else if (year % 100 != 0)
+	{
+			return TRUE;
+	}
+	else if (year % 400 != 0)
+	{
+			return FALSE;
+	}
+	return TRUE;
+}
+
+#undef FALSE
+#undef TRUE
+
+uint8_t GetNumDaysInMonth(Month month, uint16_t year) {
+	if (month == February && IsLeapYear(year)) {
+		return days_in_month[February] + 1;
+	}
+	return days_in_month[month];
+}
+
+Weekday GetDayOfWeek(Date_t* Date) {
+	Weekday dayCodeFirstDayOfYear = (Weekday) determinedaycode(Date->year);
+	int dayCodeOfDate = dayCodeFirstDayOfYear -1;
+
+	for (uint8_t idx = 0; idx < Date->month; idx++) {
+			dayCodeOfDate += GetNumDaysInMonth((Month)idx, Date->year);
+	}
+
+	dayCodeOfDate += Date->day;
+
+	return (Weekday) (dayCodeOfDate % NUM_DAYS_IN_WEEK);
+}
+
 uint8_t DoTimeslotsOverlap(Timeslot_t* a, Timeslot_t* b) {
 		uint16_t a_start_mins_since_midnight = a->hour*MINUTES_PER_HOUR + a->minute;
 		uint16_t a_end_mins_since_midnight = a_start_mins_since_midnight + a->durationMins;
@@ -28,11 +86,6 @@ uint16_t TimeslotStartSplitMins(Timeslot_t* a, Timeslot_t* b) {
 		uint16_t b_start_mins_since_midnight = b->hour*MINUTES_PER_HOUR + b->minute;
 
 		return (a_min_since_midnight > b_start_mins_since_midnight) ? a_min_since_midnight - b_start_mins_since_midnight : b_start_mins_since_midnight - a_min_since_midnight;
-}
-
-Weekday GetDayOfWeek(Date_t* Date) {
-		// TODO: this should actually calculate the day of week
-		return Monday;
 }
 
 void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd) {
