@@ -62,6 +62,7 @@ void DrawHeader(SchedulerView_t* self)
 
 void DrawEventName(SchedulerView_t* self)
 {
+		FillRect(EVENT_NAME_X, EVENT_NAME_Y, DISPLAY_MAX_X, CHAR_HEIGHT, BACKGROUND_COLOR);
 		RgbColor color = (self->_currObjId == EVENT_NAME && self->_focused) ? FocusedTextColor : TEXT_COLOR;
 		char* headerStr = (char*)calloc(13u + MAX_EVENT_NAME_LEN, sizeof(char));
 		sprintf(headerStr, "Event name: %s", self->_event.eventName);
@@ -155,6 +156,7 @@ void DrawKeyBoardIfNeeded(SchedulerView_t* self)
 		{
 				RgbColor KeyboardColor = { 180, 180, 180 };
 				RgbColor KeyboardColorSelected = { 255, 180, 180 };
+				FillRect(KEYBOARD_START_X, KEYBOARD_START_Y, DISPLAY_MAX_X - KEYBOARD_START_X, DISPLAY_MAX_Y - KEYBOARD_START_Y, KeyboardColor);
 				for (uint8_t jdx=0; jdx < 4; jdx++)
 				{
 						for (uint8_t idx=0; idx < 8; idx++)
@@ -166,11 +168,15 @@ void DrawKeyBoardIfNeeded(SchedulerView_t* self)
 								}
 								else
 								{
-										FillRect(KEYBOARD_START_X + (idx*KEY_WIDTH), KEYBOARD_START_Y + (jdx*KEY_HEIGHT), KEY_WIDTH, KEY_HEIGHT, KeyboardColor);
+										// FillRect(KEYBOARD_START_X + (idx*KEY_WIDTH), KEYBOARD_START_Y + (jdx*KEY_HEIGHT), KEY_WIDTH, KEY_HEIGHT, KeyboardColor);
 								}
 								DrawString(KEYBOARD_START_X + (idx*KEY_WIDTH) + LEFT_CHAR_OFFSET_X_POS, KEYBOARD_START_Y + (jdx*KEY_HEIGHT) + TOP_CHAR_OFFSET_Y_POS, keyboard[jdx][idx], TEXT_COLOR);
 						}
 				}
+		}
+		else
+		{
+				FillRect(KEYBOARD_START_X, KEYBOARD_START_Y, DISPLAY_MAX_X - KEYBOARD_START_X, DISPLAY_MAX_Y - KEYBOARD_START_Y, BACKGROUND_COLOR);
 		}
 }
 
@@ -180,14 +186,13 @@ void SchedulerViewDraw(View_t* self)
 		DrawHeader(selfView);
 		DrawEventName(selfView);
 		DrawEventStartTime(selfView);
-		DrawEventEndtime(selfView);
-		if (selfView->_currObjId == EVENT_NAME && !selfView->_focused)
+		DrawEventEndtime(selfView);	
+		DrawKeyBoardIfNeeded(selfView);
+		if (!(selfView->_currObjId == EVENT_NAME && selfView->_focused))
 		{
 				DrawSaveAndCancelButtons(selfView);
 		}
 		DrawSelectionBulletIfNeeded(selfView);
-
-		DrawKeyBoardIfNeeded(selfView);
 }
 
 void ImplSetEventBaseInfo(SchedulerView_t *self, Date_t* eventDate, Timeslot_t* timeslot)
@@ -228,6 +233,30 @@ void ImplSelectCurrElement(SchedulerView_t *self)
 								break;
 				}
 		}
+		else
+		{
+				uint8_t lastChar = 0;
+
+				switch (self->_currObjId)
+				{
+						case EVENT_NAME:
+								lastChar = strlen(self->_event.eventName);
+								if (selectedKeyJdx == 3 && selectedKeyIdx == 7)
+								{
+										if (lastChar > 0)
+										{
+												self->_event.eventName[lastChar - 1] = '\0';
+										}
+								}
+								else if (lastChar < (MAX_EVENT_NAME_LEN-1))
+								{
+										self->_event.eventName[lastChar] = keyboard[selectedKeyJdx][selectedKeyIdx][0];
+								}
+								break;
+						default:
+								break;
+				}
+		}
 }
 
 void ImplUnselectCurrElement(SchedulerView_t *self)
@@ -235,6 +264,8 @@ void ImplUnselectCurrElement(SchedulerView_t *self)
 		if (self->_focused)
 		{
 				self->_focused = 0;
+				selectedKeyIdx = 0;
+				selectedKeyJdx = 0;
 		}
 }
 
@@ -251,6 +282,7 @@ void ImplMoveFocusUp(SchedulerView_t *self)
 				{
 						case EVENT_NAME:
 								// adjust keyboard here
+								selectedKeyJdx = (selectedKeyJdx - 1 + 4) % 4;
 								break;
 						case EVENT_START:
 								SubMinsFromTimeslot(&self->_event.scheduledTime, TIMESPAN_LEN_IN_MINS);
@@ -277,31 +309,32 @@ void ImplMoveFocusDown(SchedulerView_t *self)
 		{
 				switch (self->_currObjId)
 				{
-				case EVENT_NAME:
-						// adjust keyboard here
-						break;
-				case EVENT_START:
-						AddMinsToTimeslot(&self->_event.scheduledTime, TIMESPAN_LEN_IN_MINS);
-						break;
-				case EVENT_END:
-						if (self->_event.scheduledTime.durationMins < (HOURS_PER_DAY * MINUTES_PER_HOUR))
-						{
-								self->_event.scheduledTime.durationMins += TIMESPAN_LEN_IN_MINS;
-						}
-				default:
-						break;
+						case EVENT_NAME:
+								// adjust keyboard here
+								selectedKeyJdx = (selectedKeyJdx + 1) % 4;
+								break;
+						case EVENT_START:
+								AddMinsToTimeslot(&self->_event.scheduledTime, TIMESPAN_LEN_IN_MINS);
+								break;
+						case EVENT_END:
+								if (self->_event.scheduledTime.durationMins < (HOURS_PER_DAY * MINUTES_PER_HOUR))
+								{
+										self->_event.scheduledTime.durationMins += TIMESPAN_LEN_IN_MINS;
+								}
+						default:
+								break;
 				}
 		}
 }
 
 void ImplMoveFocusLeft(SchedulerView_t *self)
 {
-
+		selectedKeyIdx = (selectedKeyIdx - 1 + 8) % 8;
 }
 
 void ImplMoveFocusRight(SchedulerView_t *self)
 {
-
+		selectedKeyIdx = (selectedKeyIdx + 1) % 8;
 }
 
 void InitSchedulerView(SchedulerView_t* view)
