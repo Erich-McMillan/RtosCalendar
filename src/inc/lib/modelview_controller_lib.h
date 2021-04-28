@@ -1,3 +1,3 @@
-void update();
+#include <obj/view_controller.h>
 
-void initialize();
+ViewController_t* ControllerUpdate(ViewController_t* currViewController);

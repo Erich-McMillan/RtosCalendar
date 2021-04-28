@@ -26,7 +26,8 @@ typedef struct _DayView_t {
 	 uint8_t _newEventsAdded;
    int8_t _selectedEvent;
    ScheduledEvent_t* _events;
-   SetDate SetDate;
+	 uint8_t _forceRedraw;
+	 SetDate SetDate;
    GetDate GetDate;
 	 uint8_t _updatedTimeslot;
    SelectNextTimeslot SelectNextTimeslot;

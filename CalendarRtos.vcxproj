@@ -114,12 +114,15 @@
     <ClCompile Include="src\day_view.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="src\day_view_controller.c" />
     <ClCompile Include="src\lib\calendar\controller.c" />
     <ClCompile Include="src\lib\calendar\model.c" />
     <ClCompile Include="src\lib\date_time\date_time_lib.c" />
     <ClCompile Include="src\lib\modelview_controller\modelview_controller.c" />
     <ClCompile Include="src\month_view.c" />
+    <ClCompile Include="src\month_view_controller.c" />
     <ClCompile Include="src\scheduler_view.c" />
+    <ClCompile Include="src\scheduler_view_controller.c" />
     <ClCompile Include="src\user_interface.c" />
     <ClCompile Include="src\year_view.c" />
     <ClCompile Include="winhost\host.cpp" />
@@ -130,15 +133,20 @@
     <ClInclude Include="src\inc\calendar_viewer.h" />
     <ClInclude Include="src\inc\lib\date_time_lib.h" />
     <ClInclude Include="src\inc\lib\device_initialization_lib.h" />
+    <ClInclude Include="src\inc\lib\event_storage_lib.h" />
     <ClInclude Include="src\inc\lib\graphics_lib.h" />
     <ClInclude Include="src\inc\lib\interface_lib.h" />
     <ClInclude Include="src\inc\lib\modelview_controller_lib.h" />
     <ClInclude Include="src\inc\lib\view_lib.h" />
     <ClInclude Include="src\inc\obj\day_view.h" />
+    <ClInclude Include="src\inc\obj\day_view_controller.h" />
     <ClInclude Include="src\inc\obj\month_view.h" />
+    <ClInclude Include="src\inc\obj\month_view_controller.h" />
     <ClInclude Include="src\inc\obj\scheduled_event.h" />
     <ClInclude Include="src\inc\obj\scheduler_view.h" />
+    <ClInclude Include="src\inc\obj\scheduler_view_controller.h" />
     <ClInclude Include="src\inc\obj\view.h" />
+    <ClInclude Include="src\inc\obj\view_controller.h" />
     <ClInclude Include="src\inc\serialize.h" />
     <ClInclude Include="src\inc\typedef.h" />
     <ClInclude Include="src\tm4c_defines.h" />

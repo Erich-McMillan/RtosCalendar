@@ -35,6 +35,11 @@ typedef struct _Date_t {
    uint16_t year;
 } Date_t;
 
+typedef struct _CalendarTime_t {
+		uint8_t hour;
+		uint8_t minute;
+} CalendarTime_t;
+
 typedef struct _Timespan_t { 
    Date_t start;
    Date_t end;
@@ -45,6 +50,8 @@ typedef struct _Timeslot_t {
    uint8_t minute;
    uint16_t durationMins;
 } Timeslot_t;
+
+uint8_t GetNumDaysInMonth(Month month, uint16_t year);
 
 Weekday GetDayOfWeek(Date_t* Date);
 
@@ -57,3 +64,5 @@ Weekday GetDayOfWeek(Date_t* Date);
 void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd);
 
 void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub);
+
+CalendarTime_t* GetCurrentCalendarTime();

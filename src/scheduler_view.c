@@ -18,8 +18,8 @@
 #define BUTTON_WIDTH 40
 #define SAVE_BUTTON_X 5
 #define SAVE_BUTTON_Y (DISPLAY_MAX_Y - 5 - BUTTON_HEIGHT)
-#define CANCEL_BUTTON_X (DISPLAY_MAX_X - 5 - BUTTON_WIDTH)
-#define CANCEL_BUTTON_Y (DISPLAY_MAX_Y - 5 - BUTTON_HEIGHT)
+#define DELETE_BUTTON_X (DISPLAY_MAX_X - 5 - BUTTON_WIDTH)
+#define DELETE_BUTTON_Y (DISPLAY_MAX_Y - 5 - BUTTON_HEIGHT)
 #define KEY_WIDTH 16
 #define KEY_HEIGHT 16
 #define KEYBOARD_START_X 0
@@ -28,8 +28,8 @@
 RgbColor FocusedTextColor = { 255, 0, 0 };
 RgbColor SaveButtonColor = { 255, 0, 0 };
 RgbColor SaveButtonSelectedColor = { 255, 204, 204 };
-RgbColor CancelButtonColor = {0, 255, 0};
-RgbColor CancelButtonSelectedColor = { 204, 255, 204 };
+RgbColor DeleteButtonColor = {0, 255, 0};
+RgbColor DeleteButtonSelectedColor = { 204, 255, 204 };
 
 uint8_t selectedKeyIdx = 0;
 uint8_t selectedKeyJdx = 0;
@@ -46,7 +46,7 @@ typedef enum _SchedulerViewObjId {
 		EVENT_START,
 		EVENT_END,
 		EVENT_SAVE,
-		EVENT_CANCEL
+		EVENT_DELETE
 };
 
 SchedulerView_t* SchedulerViewSingleton = null;
@@ -94,14 +94,14 @@ void DrawEventEndtime(SchedulerView_t* self)
 		free(headerStr);
 }
 
-void DrawSaveAndCancelButtons(SchedulerView_t* self)
+void DrawSaveAndDeleteButtons(SchedulerView_t* self)
 {
 		RgbColor saveColor = (self->_currObjId == EVENT_SAVE) ? SaveButtonSelectedColor : SaveButtonColor;
 		FillRect(SAVE_BUTTON_X, SAVE_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, saveColor);
 		DrawString(SAVE_BUTTON_X + LEFT_CHAR_OFFSET_X_POS, SAVE_BUTTON_Y + TOP_CHAR_OFFSET_Y_POS, "Save", TEXT_COLOR);
-		RgbColor cancelColor = (self->_currObjId == EVENT_CANCEL) ? CancelButtonSelectedColor : CancelButtonColor;
-		FillRect(CANCEL_BUTTON_X, CANCEL_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, cancelColor);
-		DrawString(CANCEL_BUTTON_X + LEFT_CHAR_OFFSET_X_POS, CANCEL_BUTTON_Y + TOP_CHAR_OFFSET_Y_POS, "Cancel", TEXT_COLOR);
+		RgbColor cancelColor = (self->_currObjId == EVENT_DELETE) ? DeleteButtonSelectedColor : DeleteButtonColor;
+		FillRect(DELETE_BUTTON_X, DELETE_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT, cancelColor);
+		DrawString(DELETE_BUTTON_X + LEFT_CHAR_OFFSET_X_POS, DELETE_BUTTON_Y + TOP_CHAR_OFFSET_Y_POS, "Delete", TEXT_COLOR);
 }
 
 void DrawSelectionBullet(uint8_t ypos, RgbColor color)
@@ -190,7 +190,7 @@ void SchedulerViewDraw(View_t* self)
 		DrawKeyBoardIfNeeded(selfView);
 		if (!(selfView->_currObjId == EVENT_NAME && selfView->_focused))
 		{
-				DrawSaveAndCancelButtons(selfView);
+				DrawSaveAndDeleteButtons(selfView);
 		}
 		DrawSelectionBulletIfNeeded(selfView);
 }
@@ -204,6 +204,11 @@ void ImplSetEventBaseInfo(SchedulerView_t *self, Date_t* eventDate, Timeslot_t* 
 		self->_event.scheduledTime.hour = timeslot->hour;
 		self->_event.scheduledTime.minute = timeslot->minute;
 		self->_event.scheduledTime.durationMins = timeslot->durationMins;
+}
+
+void ImplSetExistingEventInfo(SchedulerView_t *self, ScheduledEvent_t* event)
+{
+		memcpy(&self->_event, event, sizeof(*event));
 }
 
 ScheduledEvent_t* ImplCopyScheduledEvent(SchedulerView_t *self)
@@ -226,8 +231,8 @@ void ImplSelectCurrElement(SchedulerView_t *self)
 						case EVENT_SAVE:
 								self->_state = SAVED;
 								break;
-						case EVENT_CANCEL:
-								self->_state = CANCELLED;
+						case EVENT_DELETE:
+								self->_state = DELETED;
 								break;
 						default:
 								break;
@@ -274,7 +279,7 @@ void ImplMoveFocusUp(SchedulerView_t *self)
 		if (!self->_focused)
 		{
 				self->_prevObjId = self->_currObjId;
-				self->_currObjId = (self->_currObjId + EVENT_CANCEL) % (EVENT_CANCEL + 1);
+				self->_currObjId = (self->_currObjId + EVENT_DELETE) % (EVENT_DELETE + 1);
 		}
 		else
 		{
@@ -303,7 +308,7 @@ void ImplMoveFocusDown(SchedulerView_t *self)
 		if (!self->_focused)
 		{
 				self->_prevObjId = self->_currObjId;
-				self->_currObjId = (self->_currObjId + 1) % (EVENT_CANCEL+1);
+				self->_currObjId = (self->_currObjId + 1) % (EVENT_DELETE+1);
 		}
 		else
 		{
@@ -349,6 +354,7 @@ void InitSchedulerView(SchedulerView_t* view)
 				view->CopyScheduledEvent = ImplCopyScheduledEvent;
 				view->GetSchedulerViewState = ImplGetSchedulerViewState;
 				view->SetEventBaseInfo = ImplSetEventBaseInfo;
+				view->SetExistingEventInfo = ImplSetExistingEventInfo;
 				view->SelectCurrElement = ImplSelectCurrElement;
 				view->UnselectCurrElement = ImplUnselectCurrElement;
 				view->MoveFocusUp = ImplMoveFocusUp;

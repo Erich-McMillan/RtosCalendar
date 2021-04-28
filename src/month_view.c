@@ -5,6 +5,7 @@
 #include <obj/month_view.h>
 #include <lib/graphics_lib.h>
 #include <lib/interface_lib.h>
+#include <lib/date_time_lib.h>
 
 MonthView_t* MonthViewSingleton = null;
 
@@ -19,7 +20,6 @@ MonthView_t* MonthViewSingleton = null;
 
 RgbColor SelectedIndicatorColor = { 0, 0, 0 };
 
-
 #define DAY_DRAW_X_OFFSET 2
 #define DAY_DRAW_Y_OFFSET 2
 
@@ -32,7 +32,7 @@ void CalculateDayPosition(uint8_t week, uint8_t dayOfWeek, out uint8_t* x, out u
 void DrawHeader(MonthView_t* self)
 {
 		char* headerStr = (char*)calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
-		sprintf(headerStr, "%.2d/%.4d", self->_startDate.month, self->_startDate.year);
+		sprintf(headerStr, "%.2d/%.4d", self->_startDate.month+1, self->_startDate.year);
 		DrawString(LEFT_CHAR_OFFSET_X_POS, TOP_CHAR_OFFSET_Y_POS, headerStr, TEXT_COLOR);
 		DrawHLine(0, HEADER_HEIGHT, DISPLAY_MAX_X, LINE_COLOR);
 		free(headerStr);
@@ -104,12 +104,12 @@ void ImplMonthViewDraw(View_t *self)
 		DrawSelectedDayIndicator(selfMonthView);
 }
 
-void ImplSetMonthInfo(MonthView_t* self, Date_t *startDate, uint8_t numDays)
+void ImplSetMonthInfo(MonthView_t* self, Date_t *startDate)
 {
 		self->_startDate.day = startDate->day;
 		self->_startDate.month = startDate->month;
 		self->_startDate.year = startDate->year;
-		self->_numDays = numDays;
+		self->_numDays = GetNumDaysInMonth(self->_startDate.month, self->_startDate.year);
 		self->_prevSelectedWeek = 0;
 		self->_selectedWeek = 0;
 		self->_startDateWeekday = GetDayOfWeek(&self->_startDate);

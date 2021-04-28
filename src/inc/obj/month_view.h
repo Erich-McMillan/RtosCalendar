@@ -8,7 +8,7 @@
 typedef struct _MonthView_t MonthView_t;
 
 typedef Date_t* (*MonthGetDate) (MonthView_t *self);
-typedef void (*SetMonthInfo) (MonthView_t* self, Date_t *startDate, uint8_t numDays);
+typedef void (*SetMonthInfo) (MonthView_t* self, Date_t *startDate);
 typedef void (*SelectNextWeek) (MonthView_t *self);
 typedef void (*SelectPrevWeek) (MonthView_t *self);
 typedef void (*SelectNextDay) (MonthView_t *self);

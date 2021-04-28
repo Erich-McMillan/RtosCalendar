@@ -10,12 +10,13 @@ typedef struct _SchedulerView_t SchedulerView_t;
 
 typedef enum _SchedulerViewState {
 		EDITING=0,
-		CANCELLED,
-		SAVED
+		SAVED,
+		DELETED
 } SchedulerViewState;
 
 typedef ScheduledEvent_t* (*CopyScheduledEvent) (SchedulerView_t *self);
 typedef void (*SetEventBaseInfo) (SchedulerView_t *self, Date_t* eventDate, Timeslot_t* timeslot);
+typedef void (*SetExistingEventInfo) (SchedulerView_t *self, ScheduledEvent_t* event);
 typedef SchedulerViewState (*GetSchedulerViewState) (SchedulerView_t *self);
 typedef void (*SelectCurrElement) (SchedulerView_t *self);
 typedef void (*UnselectCurrElement) (SchedulerView_t *self);
@@ -32,6 +33,7 @@ typedef struct _SchedulerView_t {
 		uint8_t _focused;
 		SchedulerViewState _state;
 		SetEventBaseInfo SetEventBaseInfo;
+		SetExistingEventInfo SetExistingEventInfo;
 		CopyScheduledEvent CopyScheduledEvent;
 		GetSchedulerViewState GetSchedulerViewState;
 		SelectCurrElement SelectCurrElement;

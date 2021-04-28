@@ -58,7 +58,7 @@ typedef struct _EventBox_t {
 
 void DrawHeader(Date_t* date) {
 		char* headerStr = (char*) calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
-		sprintf(headerStr, "%.2d/%.2d/%.4d", date->day, date->month, date->year);
+		sprintf(headerStr, "%.2d/%.2d/%.4d", date->day, date->month+1, date->year);
 		DrawString(LEFT_CHAR_OFFSET_X_POS, TOP_CHAR_OFFSET_Y_POS, headerStr, TEXT_COLOR);
 		DrawHLine(0, HEADER_HEIGHT, DISPLAY_MAX_X, LINE_COLOR);
 		free(headerStr);
@@ -128,6 +128,23 @@ void CalculateTimeslots(Timeslot_t *timeslots, uint8_t numTimeslots, Timeslot_t*
 		}
 }
 
+void DrawCurrentTime(TimeslotBox_t* timeboxes, uint8_t numTimeboxes)
+{
+		RgbColor currTimeColor = { 0, 255, 0 };
+		CalendarTime_t* currTime = GetCurrentCalendarTime();
+		Timeslot_t currTimeslot = { currTime->hour, currTime->minute, 1 };
+		for (uint8_t idx = 0; idx < numTimeboxes; idx++)
+		{
+				if (DoTimeslotsOverlap(&currTimeslot, timeboxes[idx].timeslot))
+				{
+						uint16_t timediff = currTime->hour*MINUTES_PER_HOUR + currTime->minute - timeboxes[idx].timeslot->hour * MINUTES_PER_HOUR - timeboxes[idx].timeslot->minute;
+						uint16_t percent = (100* timediff / timeboxes[idx].timeslot->durationMins);
+						uint8_t currTimeY = timeboxes[idx].y + (timeboxes[idx].height * percent)/100;
+						DrawHLine(timeboxes[idx].x, currTimeY, DISPLAY_MAX_X, currTimeColor);
+				}
+		}
+}
+
 void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, EventBox_t* events, uint8_t numEvents, uint8_t updatePlacement) {
 		// need to calculate the times of these other timeslots
 		// need to shade the currently selected timeslot
@@ -143,6 +160,7 @@ void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, EventBox_t* events, uin
 		};
 		DrawTimeslots(timeboxes, NUM_TIMESLOTS);
 		DrawEvents(timeboxes, NUM_TIMESLOTS, events, numEvents, updatePlacement);
+		DrawCurrentTime(timeboxes, NUM_TIMESLOTS);
 }
 
 void RecalculateEventPlacement(EventBox_t* eventPlacements, ScheduledEvent_t* events, uint8_t numEvents) {
@@ -174,7 +192,7 @@ void DayViewDraw(View_t* self)
 		static EventBox_t eventPlacements[MAX_EVENTS_PER_DAY] = {};
 		DayView_t* selfView = (DayView_t*)self;
 		// TODO: should determine if partial redraw if possible (i.e. the selected time didn't change only the selected object)
-		if (selfView->_newEventsAdded) {
+		if (selfView->_newEventsAdded || selfView->_forceRedraw) {
 				 RecalculateEventPlacement(eventPlacements, selfView->_events, selfView->_numEvents);
 		}
 		if (selfView->_selectedEvent >= 0) {
@@ -183,7 +201,7 @@ void DayViewDraw(View_t* self)
 				}
 				eventPlacements[selfView->_selectedEvent].selected = 1;
 		}
-		uint8_t updatePlacements = (selfView->_newEventsAdded || selfView->_updatedTimeslot) ? 1 : 0;
+		uint8_t updatePlacements = (selfView->_newEventsAdded || selfView->_updatedTimeslot || selfView->_forceRedraw) ? 1 : 0;
 		if (updatePlacements) {
 				FillScreen(BACKGROUND_COLOR);
 				DrawHeader(selfView->GetDate(selfView));
@@ -191,6 +209,7 @@ void DayViewDraw(View_t* self)
 		DrawTimeslotsAndEvents(selfView->GetCurrTimeslot(selfView), eventPlacements, selfView->_numEvents, updatePlacements);
 		selfView->_newEventsAdded = 0;
 		selfView->_updatedTimeslot = 0;
+		selfView->_forceRedraw = 0;
 }
 
 void ImplSetDate(DayView_t *self, Date_t* date) {

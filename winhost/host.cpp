@@ -10,12 +10,19 @@ using namespace Gdiplus;
 #include <obj/month_view.h>
 #include <obj/scheduler_view.h>
 #include <lib/interface_lib.h>
+#include <lib/modelview_controller_lib.h>
+#include <obj/month_view_controller.h>
+#include <obj/day_view_controller.h>
+#include <obj/scheduler_view_controller.h>
+#include <lib/event_storage_lib.h>
 
 HDC          globalhdc;
 uint8_t      globalPendingButton = 0u;
-uint8_t      DayViewSelected = 0u;
-uint8_t      MonthViewSelected = 0u;
-uint8_t      SchedulerViewSelected = 1u;
+
+MonthViewController_t MonthViewController;
+DayViewController_t DayViewController;
+SchedulerViewController_t SchedulerViewController;
+ViewController_t* CurrentController = (ViewController_t*) &MonthViewController;
 
 #define GRAPHICS_SCALING 4
 
@@ -94,22 +101,96 @@ void WaitForInput() {
 		return; // no wait in emulated env
 }
 uint8_t IsUpButtonPressed() {
-		return (globalPendingButton == UP);
+		uint8_t pressed = (globalPendingButton == UP);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
 }
 uint8_t IsDownButtonPressed() {
-		return (globalPendingButton == DOWN);
+		uint8_t pressed = (globalPendingButton == DOWN);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
 }
 uint8_t IsLeftButtonPressed() {
-		return (globalPendingButton == LEFT);
+		uint8_t pressed = (globalPendingButton == LEFT);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
 }
 uint8_t IsRightButtonPressed() {
-		return (globalPendingButton == RIGHT);
+		uint8_t pressed = (globalPendingButton == RIGHT);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
 }
 uint8_t IsSelectButtonPressed() {
-		return (globalPendingButton == SELECT);
+		uint8_t pressed = (globalPendingButton == SELECT);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
 }
 uint8_t IsBackButtonPressed() {
-		return (globalPendingButton == BACK);
+		uint8_t pressed = (globalPendingButton == BACK);
+		globalPendingButton = (pressed) ? 0 : globalPendingButton;
+		return pressed;
+}
+
+CalendarTime_t* GetCurrentCalendarTime()
+{
+		static CalendarTime_t time = { 8, 23 };
+		return &time;
+}
+
+Date_t date_april_4_2021 = { 4, April, 2021 };
+uint8_t numApril4Events = 3;
+ScheduledEvent_t april_4_2021_events[5] = {
+		{ date_april_4_2021, {8, 0, 30}, "30min event" },
+		{ date_april_4_2021, {8, 15, 15}, "15min event" },
+		{ date_april_4_2021, {8, 15, 15}, "15min event" }
+};
+Date_t date_april_8_2021 = { 8, April, 2021 };
+uint8_t numApril8Events = 3;
+ScheduledEvent_t april_8_2021_events[5] = {
+		{ date_april_8_2021, {8, 0, 30}, "30min event" },
+		{ date_april_8_2021, {8, 15, 15}, "15min event" },
+		{ date_april_8_2021, {8, 15, 15}, "15min event" }
+};
+
+void LoadEventsForDay(Date_t* day, out ScheduledEvent_t** events, out uint8_t* numEvents) {
+		if (day->year == 2021 && day->month == April && day->day == 4)
+		{
+				*events = april_4_2021_events;
+				*numEvents = numApril4Events;
+		}
+		else if (day->year == 2021 && day->month == April && day->day == 4)
+		{
+				*events = april_8_2021_events;
+				*numEvents = numApril8Events;
+		}
+		else
+		{
+				*events = NULL;
+		}
+}
+
+void SaveEvent(ScheduledEvent_t* event) {
+		if (event->scheduledDay.year == 2021 && event->scheduledDay.month == April && event->scheduledDay.day == 4)
+		{
+				memcpy(&april_4_2021_events[numApril4Events], event, sizeof(*event));
+				numApril4Events++;
+		}
+		else if (event->scheduledDay.year == 2021 && event->scheduledDay.month == April && event->scheduledDay.day == 4)
+		{
+				memcpy(&april_8_2021_events[numApril8Events], event, sizeof(*event));
+				numApril8Events++;
+		}
+}
+void DeleteEvent(ScheduledEvent_t* event) {
+		// hacky implementation only used for testing the delete path, but really expects only last added item to be deleted.
+		if (event->scheduledDay.year == 2021 && event->scheduledDay.month == April && event->scheduledDay.day == 4)
+		{
+				numApril4Events--;
+		}
+		else if (event->scheduledDay.year == 2021 && event->scheduledDay.month == April && event->scheduledDay.day == 4)
+		{
+				numApril8Events--;
+		}
 }
 
 void DayViewSetup() {
@@ -126,15 +207,19 @@ void DayViewSetup() {
 				{ date, {9, 15, 15}, "15min event" }
 		};
 		view = GetDayView();
-		((DayView_t*)view)->SetDate((DayView_t*)view, &date);
-		((DayView_t*)view)->SetEvents((DayView_t*)view, events, 8);
+		// ((DayView_t*)view)->SetDate((DayView_t*)view, &date);
+		// ((DayView_t*)view)->SetEvents((DayView_t*)view, events, 8);
+
+		InitDayViewController(&DayViewController, (ViewController_t*) &MonthViewController, (ViewController_t*) &SchedulerViewController);
 }
 
 void MonthViewSetup() {
 		View_t* view;
 		Date_t startDate = { 1, April, 2021 };
 		view = GetMonthView();
-		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate, 28);
+		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate);
+
+		InitMonthViewController(&MonthViewController, (ViewController_t*) &DayViewController);
 }
 
 void SchedulerViewSetup() {
@@ -143,6 +228,8 @@ void SchedulerViewSetup() {
 		static Timeslot_t timeslot = { 8, 15, 30 };
 		view = GetSchedulerView();
 		((SchedulerView_t*)view)->SetEventBaseInfo((SchedulerView_t*)view, &date, &timeslot);
+
+		InitSchedulerViewController(&SchedulerViewController, (ViewController_t*) &DayViewController);
 }
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -202,88 +289,88 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 		return msg.wParam;
 }  // WinMain
 
-void DayViewController() {
-		DayView_t* view;
+// void DayViewController() {
+// 		DayView_t* view;
 
-		if (DayViewSelected)
-		{
-				view = (DayView_t*)GetDayView();
-				if (IsUpButtonPressed()) {
-						view->SelectPrevTimeslot(view);
-				}
-				if (IsDownButtonPressed()) {
-						view->SelectNextTimeslot(view);
-				}
-				if (IsLeftButtonPressed()) {
-						view->SelectPrevEvent(view);
-				}
-				if (IsRightButtonPressed()) {
-						view->SelectNextEvent(view);
-				}
-				if (IsBackButtonPressed()) {
-						DayViewSelected = 0;
-						MonthViewSelected = 1;
-				}
+// 		if (DayViewSelected)
+// 		{
+// 				view = (DayView_t*)GetDayView();
+// 				if (IsUpButtonPressed()) {
+// 						view->SelectPrevTimeslot(view);
+// 				}
+// 				if (IsDownButtonPressed()) {
+// 						view->SelectNextTimeslot(view);
+// 				}
+// 				if (IsLeftButtonPressed()) {
+// 						view->SelectPrevEvent(view);
+// 				}
+// 				if (IsRightButtonPressed()) {
+// 						view->SelectNextEvent(view);
+// 				}
+// 				if (IsBackButtonPressed()) {
+// 						DayViewSelected = 0;
+// 						MonthViewSelected = 1;
+// 				}
 
-				((View_t*)view)->Draw((View_t*)view);
-		}
-}
+// 				((View_t*)view)->Draw((View_t*)view);
+// 		}
+// }
 
-void MonthViewController() {
-		MonthView_t* view;
+// void MonthViewController() {
+// 		MonthView_t* view;
 
-		if (MonthViewSelected)
-		{
-				view = (MonthView_t*)GetMonthView();
-				if (IsUpButtonPressed()) {
-						view->SelectPrevWeek(view);
-				}
-				if (IsDownButtonPressed()) {
-						view->SelectNextWeek(view);
-				}
-				if (IsLeftButtonPressed()) {
-						view->SelectPrevDay(view);
-				}
-				if (IsRightButtonPressed()) {
-						view->SelectNextDay(view);
-				}
-				if (IsSelectButtonPressed()) {
-						DayViewSelected = 1;
-						MonthViewSelected = 0u;
-				}
+// 		if (MonthViewSelected)
+// 		{
+// 				view = (MonthView_t*)GetMonthView();
+// 				if (IsUpButtonPressed()) {
+// 						view->SelectPrevWeek(view);
+// 				}
+// 				if (IsDownButtonPressed()) {
+// 						view->SelectNextWeek(view);
+// 				}
+// 				if (IsLeftButtonPressed()) {
+// 						view->SelectPrevDay(view);
+// 				}
+// 				if (IsRightButtonPressed()) {
+// 						view->SelectNextDay(view);
+// 				}
+// 				if (IsSelectButtonPressed()) {
+// 						DayViewSelected = 1;
+// 						MonthViewSelected = 0u;
+// 				}
 
-				((View_t*)view)->Draw((View_t*)view);
-		}
-}
+// 				((View_t*)view)->Draw((View_t*)view);
+// 		}
+// }
 
-void SchedulerViewController() {
-		SchedulerView_t* view;
+// void SchedulerViewController() {
+// 		SchedulerView_t* view;
 
-		if (SchedulerViewSelected)
-		{
-				view = (SchedulerView_t*)GetSchedulerView();
-				if (IsUpButtonPressed()) {
-						view->MoveFocusUp(view);
-				}
-				if (IsDownButtonPressed()) {
-						view->MoveFocusDown(view);
-				}
-				if (IsLeftButtonPressed()) {
-						view->MoveFocusLeft(view);
-				}
-				if (IsRightButtonPressed()) {
-						view->MoveFocusRight(view);
-				}
-				if (IsSelectButtonPressed()) {
-						view->SelectCurrElement(view);
-				}
-				if (IsBackButtonPressed()) {
-						view->UnselectCurrElement(view);
-				}
+// 		if (SchedulerViewSelected)
+// 		{
+// 				view = (SchedulerView_t*)GetSchedulerView();
+// 				if (IsUpButtonPressed()) {
+// 						view->MoveFocusUp(view);
+// 				}
+// 				if (IsDownButtonPressed()) {
+// 						view->MoveFocusDown(view);
+// 				}
+// 				if (IsLeftButtonPressed()) {
+// 						view->MoveFocusLeft(view);
+// 				}
+// 				if (IsRightButtonPressed()) {
+// 						view->MoveFocusRight(view);
+// 				}
+// 				if (IsSelectButtonPressed()) {
+// 						view->SelectCurrElement(view);
+// 				}
+// 				if (IsBackButtonPressed()) {
+// 						view->UnselectCurrElement(view);
+// 				}
 
-				((View_t*)view)->Draw((View_t*)view);
-		}
-}
+// 				((View_t*)view)->Draw((View_t*)view);
+// 		}
+// }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 		WPARAM wParam, LPARAM lParam)
@@ -300,9 +387,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						// call back into graphics_lib functions defined here
 						// hdc must be set to a global for this function so that
 						// the graphics functions can access it
-						SchedulerViewController();
-						DayViewController();
-						MonthViewController();
+						// SchedulerViewController();
+						// DayViewController();
+						// MonthViewController();
+						CurrentController = ControllerUpdate(CurrentController);
 						EndPaint(hWnd, &ps);
 						return 0;
 				case WM_KEYDOWN:
@@ -331,9 +419,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 						}
 						if (globalPendingButton != 0) {
 								globalhdc = GetDC(hWnd);
-								SchedulerViewController();
-								MonthViewController();
-								DayViewController();
+								// SchedulerViewController();
+								// MonthViewController();
+								// DayViewController();
+								CurrentController = ControllerUpdate(CurrentController);
 								ReleaseDC(hWnd, globalhdc);
 								globalPendingButton = 0; // reset to unpressed after handled by listeners
 						}
