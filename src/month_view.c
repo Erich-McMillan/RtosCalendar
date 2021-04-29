@@ -9,7 +9,7 @@
 
 MonthView_t* MonthViewSingleton = null;
 
-#define NUM_DAYS_IN_WEEK 7
+// #define NUM_DAYS_IN_WEEK 7
 #define NUM_WEEKS_IN_MONTH_VIEW 5
 #define DAY_OF_WEEK_HEADER_HEIGHT 13
 #define DAY_WIDTH 18
@@ -29,7 +29,7 @@ void CalculateDayPosition(uint8_t week, uint8_t dayOfWeek, out uint8_t* x, out u
 		*y = DAY_OF_WEEK_HEADER_HEIGHT + HEADER_HEIGHT + (DAY_HEIGHT * week) + DAY_DRAW_Y_OFFSET;
 }
 
-void DrawHeader(MonthView_t* self)
+void DrawHeaderMonthView(MonthView_t* self)
 {
 		char* headerStr = (char*)calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
 		sprintf(headerStr, "%.2d/%.4d", self->_startDate.month+1, self->_startDate.year);
@@ -40,7 +40,7 @@ void DrawHeader(MonthView_t* self)
 
 void DrawDayOfWeekHeader()
 {
-		static char* dayStrings[NUM_DAYS_IN_WEEK] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+		static char* dayStrings[NUM_DAYS_IN_WEEK] = { "S", "M", "T", "W", "T", "F", "S" };
 		for (uint8_t Idx = 0u; Idx < NUM_DAYS_IN_WEEK; Idx++)
 		{
 				DrawString(DAY_DRAW_X_OFFSET + (Idx * DAY_WIDTH), HEADER_HEIGHT + DAY_DRAW_X_OFFSET, dayStrings[Idx], TEXT_COLOR);
@@ -97,7 +97,7 @@ void DrawSelectedDayIndicator(MonthView_t* self)
 void ImplMonthViewDraw(View_t *self)
 {
 		MonthView_t* selfMonthView = (MonthView_t*)self;
-		DrawHeader(selfMonthView);
+		DrawHeaderMonthView(selfMonthView);
 		DrawDayOfWeekHeader();
 		DrawMonthGrid();
 		DrawDayNumbers(selfMonthView);
@@ -133,7 +133,7 @@ uint8_t PositionToDayOfMonth(MonthView_t *self, uint8_t week, uint8_t day)
 		return projectedDay;
 }
 
-Date_t* ImplGetDate(MonthView_t *self)
+Date_t* ImplGetDateMonthView(MonthView_t *self)
 {
 		uint8_t dayOfMonth = PositionToDayOfMonth(self, self->_selectedWeek, self->_selectedWeekDay);
 
@@ -187,7 +187,7 @@ void InitMonthView(MonthView_t* view)
 				memset(view, 0u, sizeof(*view));
 
 				MonthViewSingleton->_super.Draw = ImplMonthViewDraw;
-				MonthViewSingleton->GetSelectedDate = ImplGetDate;
+				MonthViewSingleton->GetSelectedDate = ImplGetDateMonthView;
 				MonthViewSingleton->SetMonthInfo = ImplSetMonthInfo;
 				MonthViewSingleton->SelectNextWeek = ImplSelectNextWeek;
 				MonthViewSingleton->SelectPrevWeek = ImplSelectPrevWeek;

@@ -1,0 +1,11 @@
+.\objects\controller.o: lib\calendar\controller.c
+.\objects\controller.o: inc/lib/modelview_controller_lib.h
+.\objects\controller.o: inc/obj/view_controller.h
+.\objects\controller.o: inc/typedef.h
+.\objects\controller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\controller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\controller.o: inc/obj/view.h
+.\objects\controller.o: inc/lib/graphics_lib.h
+.\objects\controller.o: .\tm4c_defines.h
+.\objects\controller.o: inc/lib/date_time_lib.h
+.\objects\controller.o: inc/lib/view_lib.h

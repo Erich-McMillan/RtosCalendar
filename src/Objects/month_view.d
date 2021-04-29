@@ -1,0 +1,13 @@
+.\objects\month_view.o: month_view.c
+.\objects\month_view.o: inc/typedef.h
+.\objects\month_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\month_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\month_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\month_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\month_view.o: inc/lib/view_lib.h
+.\objects\month_view.o: inc/obj/view.h
+.\objects\month_view.o: inc/obj/month_view.h
+.\objects\month_view.o: .\tm4c_defines.h
+.\objects\month_view.o: inc/lib/date_time_lib.h
+.\objects\month_view.o: inc/lib/graphics_lib.h
+.\objects\month_view.o: inc/lib/interface_lib.h

@@ -1,0 +1,15 @@
+.\objects\month_view_controller.o: month_view_controller.c
+.\objects\month_view_controller.o: inc/lib/view_lib.h
+.\objects\month_view_controller.o: inc/obj/view.h
+.\objects\month_view_controller.o: inc/lib/interface_lib.h
+.\objects\month_view_controller.o: inc/typedef.h
+.\objects\month_view_controller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\month_view_controller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\month_view_controller.o: inc/obj/month_view.h
+.\objects\month_view_controller.o: .\tm4c_defines.h
+.\objects\month_view_controller.o: inc/lib/date_time_lib.h
+.\objects\month_view_controller.o: inc/lib/graphics_lib.h
+.\objects\month_view_controller.o: inc/obj/month_view_controller.h
+.\objects\month_view_controller.o: inc/obj/view_controller.h
+.\objects\month_view_controller.o: inc/obj/day_view.h
+.\objects\month_view_controller.o: inc/obj/scheduled_event.h

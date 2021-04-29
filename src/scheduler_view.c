@@ -34,7 +34,7 @@ RgbColor DeleteButtonSelectedColor = { 204, 255, 204 };
 uint8_t selectedKeyIdx = 0;
 uint8_t selectedKeyJdx = 0;
 
-char* keyboard[4][8]{
+char* keyboard[4][8] = {
 		{"a", "b", "c", "d", "e", "f", "g", "h"},
 		{"i", "j", "k", "l", "m", "n", "o", "p"},
 		{"q", "r", "s", "t", "u", "v", "w", "x"},
@@ -47,11 +47,11 @@ typedef enum _SchedulerViewObjId {
 		EVENT_END,
 		EVENT_SAVE,
 		EVENT_DELETE
-};
+} SchedulerViewObjId;
 
 SchedulerView_t* SchedulerViewSingleton = null;
 
-void DrawHeader(SchedulerView_t* self)
+void DrawHeaderSchedulerView(SchedulerView_t* self)
 {
 		char* headerStr = (char*)calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
 		sprintf(headerStr, "Schedule Event On: %2d/%.2d/%.4d", self->_event.scheduledDay.day, self->_event.scheduledDay.month, self->_event.scheduledDay.year);
@@ -85,7 +85,7 @@ void DrawEventEndtime(SchedulerView_t* self)
 		FillRect(EVENT_END_X, EVENT_END_Y, DISPLAY_MAX_X, CHAR_HEIGHT, BACKGROUND_COLOR);
 		RgbColor color = (self->_currObjId == EVENT_END && self->_focused) ? FocusedTextColor : TEXT_COLOR;
 		char* headerStr = (char*)calloc(13u + MAX_EVENT_NAME_LEN, sizeof(char));
-		Timeslot_t endTime = {};
+		Timeslot_t endTime = {0};
 		endTime.hour = self->_event.scheduledTime.hour;
 		endTime.minute = self->_event.scheduledTime.minute;
 		AddMinsToTimeslot(&endTime, self->_event.scheduledTime.durationMins);
@@ -183,7 +183,7 @@ void DrawKeyBoardIfNeeded(SchedulerView_t* self)
 void SchedulerViewDraw(View_t* self)
 {
 		SchedulerView_t* selfView = (SchedulerView_t*)self;
-		DrawHeader(selfView);
+		DrawHeaderSchedulerView(selfView);
 		DrawEventName(selfView);
 		DrawEventStartTime(selfView);
 		DrawEventEndtime(selfView);	

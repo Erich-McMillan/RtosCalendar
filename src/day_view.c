@@ -8,7 +8,7 @@
 #define NUM_TIMESLOTS 5u
 #define TIMESLOT_HEIGHT ((DISPLAY_MAX_Y-HEADER_HEIGHT) / NUM_TIMESLOTS)
 #define TIMESLOT_TIME_CHAR_SIZE 5u // characters are 5pixels tall
-#define TIMESLOT_OFFSET 17
+#define TIMESLOT_OFFSET 33 //17
 
 #define HEADER_BODY_SEP_Y_POS 10
 
@@ -56,7 +56,7 @@ typedef struct _EventBox_t {
 		uint8_t eventOffset;
 } EventBox_t;
 
-void DrawHeader(Date_t* date) {
+void DrawHeaderDayView(Date_t* date) {
 		char* headerStr = (char*) calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
 		sprintf(headerStr, "%.2d/%.2d/%.4d", date->day, date->month+1, date->year);
 		DrawString(LEFT_CHAR_OFFSET_X_POS, TOP_CHAR_OFFSET_Y_POS, headerStr, TEXT_COLOR);
@@ -97,7 +97,7 @@ void DrawEvents(TimeslotBox_t* timeslots, uint8_t numTimeboxes, EventBox_t* even
 								FillRect(events[idx].x, events[idx].y, events[idx].width, events[idx].height, events[idx].color);
 						}
 
-						DrawString(events[idx].x + LEFT_CHAR_OFFSET_X_POS, events[idx].y + TOP_CHAR_OFFSET_Y_POS, events[idx].event->eventName, TEXT_COLOR);
+						//DrawString(events[idx].x + LEFT_CHAR_OFFSET_X_POS, events[idx].y + TOP_CHAR_OFFSET_Y_POS, events[idx].event->eventName, TEXT_COLOR);
 				}
 		}
 
@@ -149,7 +149,7 @@ void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, EventBox_t* events, uin
 		// need to calculate the times of these other timeslots
 		// need to shade the currently selected timeslot
 		// build out the timeslots first
-		Timeslot_t timeslots[NUM_TIMESLOTS] = {};
+		Timeslot_t timeslots[NUM_TIMESLOTS] = {0};
 		CalculateTimeslots(timeslots, NUM_TIMESLOTS, currentTimeslot);
 		TimeslotBox_t timeboxes[NUM_TIMESLOTS] = {
 				{ &timeslots[0], 0u, HEADER_HEIGHT + (TIMESLOT_HEIGHT * (0)), TIMESLOT_HEIGHT},
@@ -189,7 +189,7 @@ void RecalculateEventPlacement(EventBox_t* eventPlacements, ScheduledEvent_t* ev
 
 void DayViewDraw(View_t* self)
 {
-		static EventBox_t eventPlacements[MAX_EVENTS_PER_DAY] = {};
+		static EventBox_t eventPlacements[MAX_EVENTS_PER_DAY] = {0};
 		DayView_t* selfView = (DayView_t*)self;
 		// TODO: should determine if partial redraw if possible (i.e. the selected time didn't change only the selected object)
 		if (selfView->_newEventsAdded || selfView->_forceRedraw) {
@@ -204,7 +204,7 @@ void DayViewDraw(View_t* self)
 		uint8_t updatePlacements = (selfView->_newEventsAdded || selfView->_updatedTimeslot || selfView->_forceRedraw) ? 1 : 0;
 		if (updatePlacements) {
 				FillScreen(BACKGROUND_COLOR);
-				DrawHeader(selfView->GetDate(selfView));
+				DrawHeaderDayView(selfView->GetDate(selfView));
 		}
 		DrawTimeslotsAndEvents(selfView->GetCurrTimeslot(selfView), eventPlacements, selfView->_numEvents, updatePlacements);
 		selfView->_newEventsAdded = 0;

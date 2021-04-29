@@ -1,0 +1,13 @@
+.\objects\day_view.o: day_view.c
+.\objects\day_view.o: inc/typedef.h
+.\objects\day_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\day_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\day_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\day_view.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\day_view.o: inc/lib/view_lib.h
+.\objects\day_view.o: inc/obj/view.h
+.\objects\day_view.o: inc/obj/day_view.h
+.\objects\day_view.o: .\tm4c_defines.h
+.\objects\day_view.o: inc/lib/date_time_lib.h
+.\objects\day_view.o: inc/lib/graphics_lib.h
+.\objects\day_view.o: inc/obj/scheduled_event.h

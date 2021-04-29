@@ -6,10 +6,10 @@
 #define MAX_EVENTS_PER_TIMESLOT 4;
 
 // to be implmented per device, so that each device can guarantee consistency of appearence
-View_t* GetYearView();
+View_t* GetYearView(void);
 
-View_t* GetMonthView();
+View_t* GetMonthView(void);
 
-View_t* GetDayView();
+View_t* GetDayView(void);
 
-View_t* GetSchedulerView();
+View_t* GetSchedulerView(void);

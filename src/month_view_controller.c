@@ -26,7 +26,7 @@ ViewController_t* UpdateMonthView(ViewController_t* self, uint8_t reload) {
 
    ((View_t*)view)->Draw((View_t*)view);
 
-   if (IsSelectButtonPressed()) {
+   if (IsSelectButtonPressed() && self->_nextView != NULL) {
 			 DayView_t* dayView = (DayView_t*)self->_nextView->_view;
 			 MonthView_t* monthView = (MonthView_t*)self->_view;
 			 dayView->SetDate(dayView, monthView->GetSelectedDate(monthView));

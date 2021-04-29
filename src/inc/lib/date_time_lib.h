@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 #define HOURS_PER_DAY 24u
 #define MINUTES_PER_HOUR 60u
@@ -65,4 +66,4 @@ void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd);
 
 void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub);
 
-CalendarTime_t* GetCurrentCalendarTime();
+CalendarTime_t* GetCurrentCalendarTime(void);
