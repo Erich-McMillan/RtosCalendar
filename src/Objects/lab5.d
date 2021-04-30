@@ -19,5 +19,6 @@
 .\objects\lab5.o: inc/obj/scheduled_event.h
 .\objects\lab5.o: inc/obj/day_view_controller.h
 .\objects\lab5.o: inc/obj/scheduler_view_controller.h
+.\objects\lab5.o: inc/obj/scheduler_view.h
 .\objects\lab5.o: inc/lib/interface_lib.h
 .\objects\lab5.o: inc/lib/event_storage_lib.h

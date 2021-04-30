@@ -13,14 +13,27 @@
 #include <lib/modelview_controller_lib.h>
 #include <obj/day_view.h>
 #include <obj/day_view_controller.h>
+#include <obj/scheduler_view.h>
+#include <obj/scheduler_view_controller.h>
 #include <lib/graphics_lib.h>
 #include <lib/interface_lib.h>
 #include <lib/event_storage_lib.h>
 
+SchedulerViewController_t SchedulerViewController;
 DayViewController_t DayViewController;
 MonthViewController_t MonthViewController;
-ViewController_t* CurrentController = (ViewController_t*) &MonthViewController;
+ViewController_t* CurrentController = (ViewController_t*) &SchedulerViewController;
 Date_t dummyDate = { 4, April, 2021 };
+
+void SchedulerViewSetup() {
+		View_t* view;
+		static Date_t date = { 4, April, 2021 };
+		static Timeslot_t timeslot = { 8, 15, 30 };
+		view = GetSchedulerView();
+		((SchedulerView_t*)view)->SetEventBaseInfo((SchedulerView_t*)view, &date, &timeslot);
+
+		InitSchedulerViewController(&SchedulerViewController, (ViewController_t*) &DayViewController);
+}
 
 void DayViewSetup() {
 		View_t* view;
@@ -38,7 +51,7 @@ void DayViewSetup() {
 		((DayView_t*)view)->SetDate((DayView_t*)view, &dummyDate);
 		((DayView_t*)view)->SetEvents((DayView_t*)view, events, 8);
 
-		InitDayViewController(&DayViewController, (ViewController_t*) &MonthViewController, NULL);
+		InitDayViewController(&DayViewController, (ViewController_t*) &MonthViewController, (ViewController_t*) &SchedulerViewController);
 }
 
 void MonthViewSetup() {
@@ -60,6 +73,7 @@ int main(void){
   BSP_LCD_Init();
   BSP_LCD_FillScreen(LCD_WHITE);
 			
+	SchedulerViewSetup();
 	DayViewSetup();
 	MonthViewSetup();
 	
@@ -105,7 +119,7 @@ void FillScreen(RgbColor fillColor) {
 //void SetPendingButtonPress(uint8_t buttonid);
 //void WaitForInput(void);
 uint8_t IsUpButtonPressed(void) {
-	return 0;
+	return 0; // 0 not pressed, 1 pressed
 }
 
 uint8_t IsDownButtonPressed(void) {
@@ -121,7 +135,7 @@ uint8_t IsRightButtonPressed(void) {
 }
 
 uint8_t IsSelectButtonPressed(void) {
-	return ~BSP_Button1_Input();
+	//return ~BSP_Button1_Input();
 	return 0;
 }
 uint8_t IsBackButtonPressed(void) {

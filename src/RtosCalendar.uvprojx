@@ -527,6 +527,16 @@
               <FileType>1</FileType>
               <FilePath>.\lib\calendar\controller.c</FilePath>
             </File>
+            <File>
+              <FileName>os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\os.c</FilePath>
+            </File>
+            <File>
+              <FileName>osasm.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\osasm.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
