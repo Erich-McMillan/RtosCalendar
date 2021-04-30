@@ -5,6 +5,7 @@
 #include "../inc/Profile.h"
 #include "Texas.h"
 //#include "eFile.h"
+#include <tm4c123gh6pm.h>
 
 #include <lib/date_time_lib.h>
 #include <lib/view_lib.h>
@@ -70,6 +71,7 @@ int main(void){
   Profile_Init();               // initialize the 7 hardware profiling pins
   BSP_Button1_Init();
   BSP_Button2_Init();
+	BSP_Joystick_Init();
   BSP_LCD_Init();
   BSP_LCD_FillScreen(LCD_WHITE);
 			
@@ -118,29 +120,74 @@ void FillScreen(RgbColor fillColor) {
 
 //void SetPendingButtonPress(uint8_t buttonid);
 //void WaitForInput(void);
-uint8_t IsUpButtonPressed(void) {
-	return 0; // 0 not pressed, 1 pressed
+uint8_t IsUpButtonPressed(void)
+{
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(y>767)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 uint8_t IsDownButtonPressed(void) {
-	return 0;
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(y<256)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 uint8_t IsLeftButtonPressed(void) {
-	return 0;
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(x>75+(1023/2))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 uint8_t IsRightButtonPressed(void) {
-	return 0;
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(x<(1023/2)-75)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 uint8_t IsSelectButtonPressed(void) {
-	//return ~BSP_Button1_Input();
-	return 0;
+	return (0==BSP_Button1_Input());
+	//return 0;
 }
 uint8_t IsBackButtonPressed(void) {
-	return 0;
-	// return ~BSP_Button2_Input();
+	//return 0;
+	return (0==BSP_Button2_Input());
 }
 
 CalendarTime_t DummyTime = {8, 12};
