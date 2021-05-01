@@ -39,9 +39,9 @@ ViewController_t* UpdateMonthView(ViewController_t* self, uint8_t reload) {
    return self;
 }
 
-void InitMonthViewController(MonthViewController_t* controller, ViewController_t* dayViewController) {
+void InitMonthViewController(MonthViewController_t* controller, ViewController_t* yearViewController, ViewController_t* dayViewController) {
    controller->_super._view = GetMonthView();
-   controller->_super._prevView = NULL;
+   controller->_super._prevView = yearViewController;
    controller->_super._nextView = dayViewController;
    controller->_super.Update = UpdateMonthView;
 }

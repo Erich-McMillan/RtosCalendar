@@ -54,6 +54,9 @@
     <ClCompile Include="src\scheduler_view_controller.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\year_view_controller.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\tm4c_defines.h">
@@ -123,6 +126,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\lib\event_storage_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\obj\year_view.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

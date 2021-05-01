@@ -125,6 +125,7 @@
     <ClCompile Include="src\scheduler_view_controller.c" />
     <ClCompile Include="src\user_interface.c" />
     <ClCompile Include="src\year_view.c" />
+    <ClCompile Include="src\year_view_controller.c" />
     <ClCompile Include="winhost\host.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +148,7 @@
     <ClInclude Include="src\inc\obj\scheduler_view_controller.h" />
     <ClInclude Include="src\inc\obj\view.h" />
     <ClInclude Include="src\inc\obj\view_controller.h" />
+    <ClInclude Include="src\inc\obj\year_view.h" />
     <ClInclude Include="src\inc\serialize.h" />
     <ClInclude Include="src\inc\typedef.h" />
     <ClInclude Include="src\tm4c_defines.h" />

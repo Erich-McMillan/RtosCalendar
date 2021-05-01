@@ -8,11 +8,13 @@ using namespace Gdiplus;
 #include <lib/view_lib.h>
 #include <obj/day_view.h>
 #include <obj/month_view.h>
+#include <obj/year_view.h>
 #include <obj/scheduler_view.h>
 #include <lib/interface_lib.h>
 #include <lib/modelview_controller_lib.h>
 #include <obj/month_view_controller.h>
 #include <obj/day_view_controller.h>
+#include <obj/year_view_controller.h>
 #include <obj/scheduler_view_controller.h>
 #include <lib/event_storage_lib.h>
 
@@ -22,7 +24,8 @@ uint8_t      globalPendingButton = 0u;
 MonthViewController_t MonthViewController;
 DayViewController_t DayViewController;
 SchedulerViewController_t SchedulerViewController;
-ViewController_t* CurrentController = (ViewController_t*) &MonthViewController;
+YearViewController_t YearViewController;
+ViewController_t* CurrentController = (ViewController_t*) &YearViewController;
 
 #define GRAPHICS_SCALING 4
 
@@ -219,7 +222,7 @@ void MonthViewSetup() {
 		view = GetMonthView();
 		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate);
 
-		InitMonthViewController(&MonthViewController, (ViewController_t*) &DayViewController);
+		InitMonthViewController(&MonthViewController, (ViewController_t*) &YearViewController, (ViewController_t*) &DayViewController);
 }
 
 void SchedulerViewSetup() {
@@ -230,6 +233,15 @@ void SchedulerViewSetup() {
 		((SchedulerView_t*)view)->SetEventBaseInfo((SchedulerView_t*)view, &date, &timeslot);
 
 		InitSchedulerViewController(&SchedulerViewController, (ViewController_t*) &DayViewController);
+}
+
+void YearViewSetup() {
+		View_t* view;
+		static Date_t date = { 4, April, 2021 };
+		view = GetYearView();
+		((YearView_t*)view)->SetDate((YearView_t*)view, &date);
+
+		InitYearViewController(&YearViewController, NULL, (ViewController_t*)&MonthViewController);
 }
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -246,6 +258,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 		DayViewSetup();
 		MonthViewSetup();
 		SchedulerViewSetup();
+		YearViewSetup();
 
 		// Initialize GDI+.
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -288,89 +301,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 		GdiplusShutdown(gdiplusToken);
 		return msg.wParam;
 }  // WinMain
-
-// void DayViewController() {
-// 		DayView_t* view;
-
-// 		if (DayViewSelected)
-// 		{
-// 				view = (DayView_t*)GetDayView();
-// 				if (IsUpButtonPressed()) {
-// 						view->SelectPrevTimeslot(view);
-// 				}
-// 				if (IsDownButtonPressed()) {
-// 						view->SelectNextTimeslot(view);
-// 				}
-// 				if (IsLeftButtonPressed()) {
-// 						view->SelectPrevEvent(view);
-// 				}
-// 				if (IsRightButtonPressed()) {
-// 						view->SelectNextEvent(view);
-// 				}
-// 				if (IsBackButtonPressed()) {
-// 						DayViewSelected = 0;
-// 						MonthViewSelected = 1;
-// 				}
-
-// 				((View_t*)view)->Draw((View_t*)view);
-// 		}
-// }
-
-// void MonthViewController() {
-// 		MonthView_t* view;
-
-// 		if (MonthViewSelected)
-// 		{
-// 				view = (MonthView_t*)GetMonthView();
-// 				if (IsUpButtonPressed()) {
-// 						view->SelectPrevWeek(view);
-// 				}
-// 				if (IsDownButtonPressed()) {
-// 						view->SelectNextWeek(view);
-// 				}
-// 				if (IsLeftButtonPressed()) {
-// 						view->SelectPrevDay(view);
-// 				}
-// 				if (IsRightButtonPressed()) {
-// 						view->SelectNextDay(view);
-// 				}
-// 				if (IsSelectButtonPressed()) {
-// 						DayViewSelected = 1;
-// 						MonthViewSelected = 0u;
-// 				}
-
-// 				((View_t*)view)->Draw((View_t*)view);
-// 		}
-// }
-
-// void SchedulerViewController() {
-// 		SchedulerView_t* view;
-
-// 		if (SchedulerViewSelected)
-// 		{
-// 				view = (SchedulerView_t*)GetSchedulerView();
-// 				if (IsUpButtonPressed()) {
-// 						view->MoveFocusUp(view);
-// 				}
-// 				if (IsDownButtonPressed()) {
-// 						view->MoveFocusDown(view);
-// 				}
-// 				if (IsLeftButtonPressed()) {
-// 						view->MoveFocusLeft(view);
-// 				}
-// 				if (IsRightButtonPressed()) {
-// 						view->MoveFocusRight(view);
-// 				}
-// 				if (IsSelectButtonPressed()) {
-// 						view->SelectCurrElement(view);
-// 				}
-// 				if (IsBackButtonPressed()) {
-// 						view->UnselectCurrElement(view);
-// 				}
-
-// 				((View_t*)view)->Draw((View_t*)view);
-// 		}
-// }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message,
 		WPARAM wParam, LPARAM lParam)
