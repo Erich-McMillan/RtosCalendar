@@ -22,15 +22,15 @@ void DrawYearMonth(YearView_t *self)
 		RgbColor SelectedColor = { 255, 0, 0 };
 
 		FillRect(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS, DISPLAY_MAX_X, YEAR_CHAR_HEIGHT, BACKGROUND_COLOR);
-		char* yearStr = (char*)calloc(5, sizeof(char));
-		sprintf(yearStr, "%.4d", self->_selectedDate.year);
+		char* yearStr = (char*)calloc(11, sizeof(char));
+		sprintf(yearStr, "Year: %.4d", self->_selectedDate.year);
 		RgbColor color = (self->_selectedItem == YEAR) ? SelectedColor : TEXT_COLOR;
 		DrawString(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS, yearStr, color);
 		free(yearStr);
 
 		FillRect(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS+ YEAR_CHAR_HEIGHT, DISPLAY_MAX_X, YEAR_CHAR_HEIGHT, BACKGROUND_COLOR);
-		char* monthStr = (char*)calloc(3, sizeof(char));
-		sprintf(monthStr, "%.2d", self->_selectedDate.month+1);
+		char* monthStr = (char*)calloc(8, sizeof(char));
+		sprintf(monthStr, "Mon: %.2d", self->_selectedDate.month+1);
 		color = (self->_selectedItem == MONTH) ? SelectedColor : TEXT_COLOR;
 		DrawString(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS + YEAR_CHAR_HEIGHT, monthStr, color);
 		free(monthStr);
@@ -92,7 +92,7 @@ void InitYearView(YearView_t* view)
 				memset(view, 0u, sizeof(*view));
 
 				YearViewSingleton->_super.Draw = ImplYearViewDraw;
-				YearViewSingleton->SetDate = ImplSetDateYearView;
+				YearViewSingleton->SetInfo = ImplSetDateYearView;
 				YearViewSingleton->GetSelectedDate = ImplGetDateYearView;
 				YearViewSingleton->IncrementValue = ImplIncrementValue;
 				YearViewSingleton->DecrementValue = ImplDecrementValue;

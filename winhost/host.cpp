@@ -10,12 +10,14 @@ using namespace Gdiplus;
 #include <obj/month_view.h>
 #include <obj/year_view.h>
 #include <obj/scheduler_view.h>
+#include <obj/set_time_view.h>
 #include <lib/interface_lib.h>
 #include <lib/modelview_controller_lib.h>
 #include <obj/month_view_controller.h>
 #include <obj/day_view_controller.h>
 #include <obj/year_view_controller.h>
 #include <obj/scheduler_view_controller.h>
+#include <obj/set_time_view_controller.h>
 #include <lib/event_storage_lib.h>
 
 HDC          globalhdc;
@@ -25,7 +27,8 @@ MonthViewController_t MonthViewController;
 DayViewController_t DayViewController;
 SchedulerViewController_t SchedulerViewController;
 YearViewController_t YearViewController;
-ViewController_t* CurrentController = (ViewController_t*) &YearViewController;
+SetTimeViewController_t SetTimeViewController;
+ViewController_t* CurrentController = (ViewController_t*) &SetTimeViewController;
 
 #define GRAPHICS_SCALING 4
 
@@ -239,9 +242,16 @@ void YearViewSetup() {
 		View_t* view;
 		static Date_t date = { 4, April, 2021 };
 		view = GetYearView();
-		((YearView_t*)view)->SetDate((YearView_t*)view, &date);
+		((YearView_t*)view)->SetInfo((YearView_t*)view, &date);
 
-		InitYearViewController(&YearViewController, NULL, (ViewController_t*)&MonthViewController);
+		InitYearViewController(&YearViewController, (ViewController_t*) &SetTimeViewController, (ViewController_t*) &MonthViewController);
+}
+
+void SetTimeViewSetup() {
+		View_t* view;
+		view = GetSetTimeView();
+
+		InitSetTimeViewController(&SetTimeViewController, (ViewController_t*) &YearViewController);
 }
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -259,6 +269,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow)
 		MonthViewSetup();
 		SchedulerViewSetup();
 		YearViewSetup();
+		SetTimeViewSetup();
 
 		// Initialize GDI+.
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);

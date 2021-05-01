@@ -23,9 +23,8 @@ typedef struct _YearView_t {
 		View_t _super;
 		YearSelectedItem _selectedItem;
 		Date_t _selectedDate;
-		uint8_t _selectedYear;
 		Month _selectedMonth;
-		SetYearInfo SetDate;
+		SetYearInfo SetInfo;
 		YearGetDate GetSelectedDate;
 		IncrementValue IncrementValue;
 		DecrementValue DecrementValue;

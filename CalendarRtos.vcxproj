@@ -123,6 +123,8 @@
     <ClCompile Include="src\month_view_controller.c" />
     <ClCompile Include="src\scheduler_view.c" />
     <ClCompile Include="src\scheduler_view_controller.c" />
+    <ClCompile Include="src\set_time_view.c" />
+    <ClCompile Include="src\set_time_view_controller.c" />
     <ClCompile Include="src\user_interface.c" />
     <ClCompile Include="src\year_view.c" />
     <ClCompile Include="src\year_view_controller.c" />
@@ -146,6 +148,8 @@
     <ClInclude Include="src\inc\obj\scheduled_event.h" />
     <ClInclude Include="src\inc\obj\scheduler_view.h" />
     <ClInclude Include="src\inc\obj\scheduler_view_controller.h" />
+    <ClInclude Include="src\inc\obj\set_time_view.h" />
+    <ClInclude Include="src\inc\obj\set_time_view_controller.h" />
     <ClInclude Include="src\inc\obj\view.h" />
     <ClInclude Include="src\inc\obj\view_controller.h" />
     <ClInclude Include="src\inc\obj\year_view.h" />

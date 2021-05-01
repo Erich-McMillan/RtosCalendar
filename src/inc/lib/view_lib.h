@@ -13,3 +13,5 @@ View_t* GetMonthView(void);
 View_t* GetDayView(void);
 
 View_t* GetSchedulerView(void);
+
+View_t* GetSetTimeView(void);

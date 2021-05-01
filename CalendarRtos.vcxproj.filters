@@ -57,6 +57,12 @@
     <ClCompile Include="src\year_view_controller.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\set_time_view.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\set_time_view_controller.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\tm4c_defines.h">
@@ -129,6 +135,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\inc\obj\year_view.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\obj\set_time_view.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inc\obj\set_time_view_controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
