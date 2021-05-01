@@ -11,7 +11,8 @@ typedef struct _SchedulerView_t SchedulerView_t;
 typedef enum _SchedulerViewState {
 		EDITING=0,
 		SAVED,
-		DELETED
+		DELETED,
+	  CANCELED
 } SchedulerViewState;
 
 typedef ScheduledEvent_t* (*CopyScheduledEvent) (SchedulerView_t *self);

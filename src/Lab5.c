@@ -1,10 +1,10 @@
 #include <stdint.h>
 #include "../inc/BSP.h"
 #include "../inc/CortexM.h"
-//#include "eDisk.h"
+#include "eDisk.h"
 #include "../inc/Profile.h"
 #include "Texas.h"
-//#include "eFile.h"
+#include "eFile.h"
 #include <tm4c123gh6pm.h>
 
 #include <lib/date_time_lib.h>
@@ -64,24 +64,64 @@ void MonthViewSetup() {
 		InitMonthViewController(&MonthViewController, (ViewController_t*) &DayViewController);
 }
 
+void TestWriteToRom() {
+	uint8_t buff[512];
+	// OS_File_Format();
+	// MountDirectory();
+	uint8_t fileSize = OS_File_Size(0);
+	if (fileSize == 0) {
+		buff[0] = 0xDE;
+		buff[1] = 0xAD;
+		buff[2] = 0xBE;
+		buff[3] = 0xEF;
+		OS_File_Append(0, buff);
+		OS_File_Flush();
+	}
+}
+
+void TestReadFromRom() {
+	uint8_t buff[512];
+	uint8_t bytesRead = OS_File_Read(0, 0, buff);
+	return;
+}
+
 int main(void){
   volatile int i;
   DisableInterrupts();
   BSP_Clock_InitFastest();
   Profile_Init();               // initialize the 7 hardware profiling pins
-  BSP_Button1_Init();
+  eDisk_Init(0);
+	OS_File_Format();
+  MountDirectory();
+	BSP_Button1_Init();
   BSP_Button2_Init();
-	BSP_Joystick_Init();
+  BSP_Joystick_Init();
   BSP_LCD_Init();
   BSP_LCD_FillScreen(LCD_WHITE);
-			
-	SchedulerViewSetup();
-	DayViewSetup();
-	MonthViewSetup();
+
+	Date_t day = { 4, April, 2021 };
+	uint8_t numEvents;
+	ScheduledEvent_t* events[10] = {0};
+
+	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
 	
-	while(1) {
-		CurrentController = ControllerUpdate(CurrentController);
-	}
+	ScheduledEvent_t eventToAdd = { { 4, April, 2021 }, {8, 0, 30}, "30min event" };
+
+	SaveEvent(&eventToAdd);
+
+	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
+	
+	DeleteEvent(&eventToAdd);
+	
+	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
+
+	// SchedulerViewSetup();
+	// DayViewSetup();
+	// MonthViewSetup();
+	
+	// while(1) {
+	// 	CurrentController = ControllerUpdate(CurrentController);
+	// }
 }
 
 RgbColor BACKGROUND_COLOR = {255, 255, 255}; // white
@@ -194,16 +234,4 @@ CalendarTime_t DummyTime = {8, 12};
 CalendarTime_t* GetCurrentCalendarTime(void) {
 	// systick to update the time
 	return &DummyTime;
-}
-
-void LoadEventsForDay(Date_t* day, out ScheduledEvent_t** events, out uint8_t* numEvents) {
-	*numEvents = 0;
-}
-
-void SaveEvent(ScheduledEvent_t* event) {
-	return;
-}
-
-void DeleteEvent(ScheduledEvent_t* event) {
-	return;
 }

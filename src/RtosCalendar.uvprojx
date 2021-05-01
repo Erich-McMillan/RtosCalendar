@@ -537,6 +537,11 @@
               <FileType>2</FileType>
               <FilePath>.\osasm.s</FilePath>
             </File>
+            <File>
+              <FileName>event_storage_lib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lib\event_storage\event_storage_lib.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

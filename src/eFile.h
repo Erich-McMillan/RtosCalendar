@@ -4,6 +4,7 @@
 // Daniel and Jonathan Valvano
 // August 29, 2016
 
+void MountDirectory(void);
 
 //********OS_File_New*************
 // Returns a file number of a new file for writing

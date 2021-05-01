@@ -28,7 +28,12 @@ ViewController_t* UpdateSchedulerView(ViewController_t* self, uint8_t reload) {
          view->SelectCurrElement(view);
    }
    if (IsBackButtonPressed()) {
-         view->UnselectCurrElement(view);
+			if (view->_focused) {
+					view->UnselectCurrElement(view);
+			}
+			else {
+				view->_state = CANCELED;
+			}
    }
 
    ((View_t*)view)->Draw((View_t*)view);
@@ -44,6 +49,9 @@ ViewController_t* UpdateSchedulerView(ViewController_t* self, uint8_t reload) {
 	 if (view->_state == DELETED) {
 			 DeleteEvent(&view->_event);
 			 return self->_prevView;
+	 }
+	 if (view->_state == CANCELED) {
+		   return self->_prevView;
 	 }
 
    return self;
