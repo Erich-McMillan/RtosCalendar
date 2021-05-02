@@ -66,4 +66,10 @@ void AddMinsToTimeslot(Timeslot_t* a, uint16_t minsToAdd);
 
 void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub);
 
-CalendarTime_t* GetCurrentCalendarTime(void);
+CalendarTime_t* GetCurrentSystemTime(void);
+
+Date_t* GetCurrentSystemDate(void);
+
+void SetSystemTime(CalendarTime_t* Time);
+
+void SetSystemDate(Date_t* Date);

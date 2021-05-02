@@ -9,14 +9,14 @@
 ViewController_t* UpdateDayView(ViewController_t* self, uint8_t reload) {
    DayView_t* view = (DayView_t*) self->_view;
 
-	 view->_forceRedraw = reload;
+      view->_forceRedraw = reload;
 
-	 if (reload) {
-			 ScheduledEvent_t* events = NULL;
-			 uint8_t numEvents = 0;
-			 LoadEventsForDay(view->GetDate(view), &events, &numEvents);
-			 view->SetEvents(view, events, numEvents);
-	 }
+      if (reload) {
+            ScheduledEvent_t* events = NULL;
+            uint8_t numEvents = 0;
+            LoadEventsForDay(view->GetDate(view), &events, &numEvents);
+            view->SetEvents(view, events, numEvents);
+      }
 
    if (IsUpButtonPressed()) {
          view->SelectPrevTimeslot(view);
@@ -34,17 +34,17 @@ ViewController_t* UpdateDayView(ViewController_t* self, uint8_t reload) {
    ((View_t*)view)->Draw((View_t*)view);
 
    if (IsSelectButtonPressed() && self->_nextView != NULL) {
-			 SchedulerView_t* schedulerView = (SchedulerView_t*)self->_nextView->_view;
-			 ScheduledEvent_t* selectedEvent = view->GetSelectedEvent(view);
-			 if (selectedEvent != NULL)
-			 {
-					 schedulerView->SetExistingEventInfo(schedulerView, selectedEvent);
-			 }
-			 else
-			 {
-					 schedulerView->SetEventBaseInfo(schedulerView, view->GetDate(view), view->GetCurrTimeslot(view));
-			 }
-       return self->_nextView;
+      SchedulerView_t* schedulerView = (SchedulerView_t*)self->_nextView->_view;
+      ScheduledEvent_t* selectedEvent = view->GetSelectedEvent(view);
+      if (selectedEvent != NULL)
+      {
+                  schedulerView->SetExistingEventInfo(schedulerView, selectedEvent);
+      }
+      else
+      {
+                  schedulerView->SetEventBaseInfo(schedulerView, view->GetDate(view), view->GetCurrTimeslot(view));
+      }
+      return self->_nextView;
    }
    if (IsBackButtonPressed()) {
       return self->_prevView;

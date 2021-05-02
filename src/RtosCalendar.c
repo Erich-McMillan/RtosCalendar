@@ -32,46 +32,21 @@ YearViewController_t YearViewController;
 SetTimeViewController_t SetTimeViewController;
 ViewController_t* CurrentController = (ViewController_t*) &SetTimeViewController;
 Date_t dummyDate = { 4, April, 2021 };
-int32_t InputSema = 0;
+int32_t RefreshSema = 0;
 int32_t ReadyForInputSema = 0;
+int32_t FileWriteSema = 0;
 ButtonId CurrentPressedButton = NONE;
 
 void SchedulerViewSetup() {
-		View_t* view;
-		static Date_t date = { 4, April, 2021 };
-		static Timeslot_t timeslot = { 8, 15, 30 };
-		view = GetSchedulerView();
-		((SchedulerView_t*)view)->SetEventBaseInfo((SchedulerView_t*)view, &date, &timeslot);
-
-		InitSchedulerViewController(&SchedulerViewController, (ViewController_t*) &DayViewController);
+   InitSchedulerViewController(&SchedulerViewController, (ViewController_t*) &DayViewController);
 }
 
 void DayViewSetup() {
-		View_t* view;
-		static ScheduledEvent_t events[8] = {
-				{ { 4, April, 2021 }, {8, 0, 30}, "30min event" },
-				{ { 4, April, 2021 }, {8, 15, 15}, "15min event" },
-				{ { 4, April, 2021 }, {8, 15, 15}, "15min event" },
-				{ { 4, April, 2021 }, {8, 30, 15}, "15min event" },
-				{ { 4, April, 2021 }, {8, 30, 45}, "45min event" },
-				{ { 4, April, 2021 }, {8, 30, 60}, "60min event" },
-				{ { 4, April, 2021 }, {9, 15, 15}, "15min event" },
-				{ { 4, April, 2021 }, {9, 15, 15}, "15min event" }
-		};
-		view = GetDayView();
-		((DayView_t*)view)->SetDate((DayView_t*)view, &dummyDate);
-		((DayView_t*)view)->SetEvents((DayView_t*)view, events, 8);
-
-		InitDayViewController(&DayViewController, (ViewController_t*) &MonthViewController, (ViewController_t*) &SchedulerViewController);
+   InitDayViewController(&DayViewController, (ViewController_t*) &MonthViewController, (ViewController_t*) &SchedulerViewController);
 }
 
 void MonthViewSetup() {
-		View_t* view;
-		Date_t startDate = { 1, April, 2021 };
-		view = GetMonthView();
-		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate);
-
-		InitMonthViewController(&MonthViewController, (ViewController_t*) &YearViewController, (ViewController_t*) &DayViewController);
+   InitMonthViewController(&MonthViewController, (ViewController_t*) &YearViewController, (ViewController_t*) &DayViewController);
 }
 
 void YearViewSetup() {
@@ -107,13 +82,14 @@ void CalendarThread() {
    while(1) {
 		CurrentController = ControllerUpdate(CurrentController);
       OS_Signal(&ReadyForInputSema);
-      OS_Wait(&InputSema);
+      OS_Wait(&RefreshSema);
 	}
 }
 
 void FilesystemThread() {
    while(1) {
-
+      OS_Wait(&FileWriteSema);
+      OS_File_Flush();
    }
 }
 
@@ -194,7 +170,7 @@ uint8_t ImplIsBackButtonPressed(void) {
 }
 
 void InputThread() {
-   if (ReadyForInputSema == 1 && InputSema == 0) {
+   if (ReadyForInputSema != 0 && RefreshSema == 0) {
       CurrentPressedButton = NONE;
       if (ImplIsUpButtonPressed()) {
          CurrentPressedButton = UP;
@@ -216,14 +192,20 @@ void InputThread() {
       }
 
       if (CurrentPressedButton != NONE) {
-				 ReadyForInputSema = 0;
-         OS_Signal(&InputSema);
+				ReadyForInputSema = 0;
+				OS_Signal(&RefreshSema);
       }
    }
 }
 
 void TimerThread() {
+   CalendarTime_t* Time = GetCurrentSystemTime();
+   uint8_t hoursToAdd = (Time->minute + 1) / MINUTES_PER_HOUR;
 
+   Time->minute = (Time->minute + 1) % MINUTES_PER_HOUR;
+   Time->hour = (Time->hour + hoursToAdd) % HOURS_PER_DAY;
+
+   OS_Signal(&RefreshSema);
 }
 
 int main(void){
@@ -248,8 +230,8 @@ int main(void){
 
    OS_Init();
    OS_AddThreads3(CalendarThread, FilesystemThread, EmptyThread);
-   OS_AddPeriodicEventThreads(InputThread, 10, TimerThread, 16000);
-
+   // OS_AddPeriodicEventThreads(InputThread, 10, TimerThread, 6000); // actual code 1 tick every 60seconds
+   OS_AddPeriodicEventThreads(InputThread, 10, TimerThread, 600);
    OS_Launch(BSP_Clock_GetFreq()/100);
 }
 

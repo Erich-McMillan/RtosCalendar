@@ -103,14 +103,32 @@ void DrawEvents(TimeslotBox_t* timeslots, uint8_t numTimeboxes, EventBox_t* even
 
 }
 
-void DrawTimeslots(TimeslotBox_t* timeslots, uint8_t numTimeslots) {
+void DrawTimeslots(Date_t* date, TimeslotBox_t* timeslots, uint8_t numTimeslots) {
+		Date_t* currDate = GetCurrentSystemDate();
+		CalendarTime_t* currTime = GetCurrentSystemTime();
+		Timeslot_t currTimeTimeslot = { currTime->hour, currTime->minute, 1 };
+		RgbColor currTimeColor = { 0, 255, 0 };
+
+
 		for (uint8_t timeslotId = 0u; timeslotId < numTimeslots; timeslotId++) {
-				TimeslotBox_t currTimeslot = timeslots[timeslotId];
-				char* timeStr = (char*) calloc(6u, sizeof(char));
-				sprintf(timeStr, "%.2d:%.2d", currTimeslot.timeslot->hour, currTimeslot.timeslot->minute);
-				DrawString(LEFT_CHAR_OFFSET_X_POS, currTimeslot.y + TOP_CHAR_OFFSET_Y_POS, timeStr, TEXT_COLOR);
-				DrawHLine(currTimeslot.x, currTimeslot.y + currTimeslot.height, DISPLAY_MAX_X, LINE_COLOR);
-				free(timeStr);
+			TimeslotBox_t currTimeslot = timeslots[timeslotId];
+			if (currDate->year == date->year && currDate->month == date->month && currDate->day == date->day)
+			{
+				if (DoTimeslotsOverlap(currTimeslot.timeslot, &currTimeTimeslot))
+				{
+						FillRect(currTimeslot.x,currTimeslot.y, DISPLAY_MAX_X, currTimeslot.height, BACKGROUND_COLOR);
+						DrawHLine(currTimeslot.x, currTimeslot.y, DISPLAY_MAX_X, LINE_COLOR);
+						uint16_t timediff = currTime->hour*MINUTES_PER_HOUR + currTime->minute - currTimeslot.timeslot->hour * MINUTES_PER_HOUR - currTimeslot.timeslot->minute;
+						uint16_t percent = (100* timediff / currTimeslot.timeslot->durationMins);
+						uint8_t currTimeY = currTimeslot.y + (currTimeslot.height * percent)/100;
+						DrawHLine(currTimeslot.x, currTimeY, DISPLAY_MAX_X, currTimeColor);
+				}
+			}
+			char* timeStr = (char*) calloc(6u, sizeof(char));
+			sprintf(timeStr, "%.2d:%.2d", currTimeslot.timeslot->hour, currTimeslot.timeslot->minute);
+			DrawString(LEFT_CHAR_OFFSET_X_POS, currTimeslot.y + TOP_CHAR_OFFSET_Y_POS, timeStr, TEXT_COLOR);
+			DrawHLine(currTimeslot.x, currTimeslot.y + currTimeslot.height, DISPLAY_MAX_X, LINE_COLOR);
+			free(timeStr);
 		}
 }
 
@@ -128,24 +146,7 @@ void CalculateTimeslots(Timeslot_t *timeslots, uint8_t numTimeslots, Timeslot_t*
 		}
 }
 
-void DrawCurrentTime(TimeslotBox_t* timeboxes, uint8_t numTimeboxes)
-{
-		RgbColor currTimeColor = { 0, 255, 0 };
-		CalendarTime_t* currTime = GetCurrentCalendarTime();
-		Timeslot_t currTimeslot = { currTime->hour, currTime->minute, 1 };
-		for (uint8_t idx = 0; idx < numTimeboxes; idx++)
-		{
-				if (DoTimeslotsOverlap(&currTimeslot, timeboxes[idx].timeslot))
-				{
-						uint16_t timediff = currTime->hour*MINUTES_PER_HOUR + currTime->minute - timeboxes[idx].timeslot->hour * MINUTES_PER_HOUR - timeboxes[idx].timeslot->minute;
-						uint16_t percent = (100* timediff / timeboxes[idx].timeslot->durationMins);
-						uint8_t currTimeY = timeboxes[idx].y + (timeboxes[idx].height * percent)/100;
-						DrawHLine(timeboxes[idx].x, currTimeY, DISPLAY_MAX_X, currTimeColor);
-				}
-		}
-}
-
-void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, EventBox_t* events, uint8_t numEvents, uint8_t updatePlacement) {
+void DrawTimeslotsAndEvents(Date_t* date, Timeslot_t* currentTimeslot, EventBox_t* events, uint8_t numEvents, uint8_t updatePlacement) {
 		// need to calculate the times of these other timeslots
 		// need to shade the currently selected timeslot
 		// build out the timeslots first
@@ -158,9 +159,8 @@ void DrawTimeslotsAndEvents(Timeslot_t* currentTimeslot, EventBox_t* events, uin
 				{ &timeslots[3], 0u, HEADER_HEIGHT + (TIMESLOT_HEIGHT * (3)), TIMESLOT_HEIGHT},
 				{ &timeslots[4], 0u, HEADER_HEIGHT + (TIMESLOT_HEIGHT * (4)), TIMESLOT_HEIGHT}
 		};
-		DrawTimeslots(timeboxes, NUM_TIMESLOTS);
+		DrawTimeslots(date, timeboxes, NUM_TIMESLOTS);
 		DrawEvents(timeboxes, NUM_TIMESLOTS, events, numEvents, updatePlacement);
-		DrawCurrentTime(timeboxes, NUM_TIMESLOTS);
 }
 
 void RecalculateEventPlacement(EventBox_t* eventPlacements, ScheduledEvent_t* events, uint8_t numEvents) {
@@ -206,7 +206,7 @@ void DayViewDraw(View_t* self)
 				FillScreen(BACKGROUND_COLOR);
 				DrawHeaderDayView(selfView->GetDate(selfView));
 		}
-		DrawTimeslotsAndEvents(selfView->GetCurrTimeslot(selfView), eventPlacements, selfView->_numEvents, updatePlacements);
+		DrawTimeslotsAndEvents(selfView->GetDate(selfView), selfView->GetCurrTimeslot(selfView), eventPlacements, selfView->_numEvents, updatePlacements);
 		selfView->_newEventsAdded = 0;
 		selfView->_updatedTimeslot = 0;
 		selfView->_forceRedraw = 0;

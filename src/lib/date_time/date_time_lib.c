@@ -117,3 +117,25 @@ void SubMinsFromTimeslot(Timeslot_t* a, uint16_t minsToSub) {
 		a->minute = clockMins;
 		a->hour = clockHour;
 }
+
+CalendarTime_t CurrentTime = {0};
+Date_t CurrentDate = {0};
+
+CalendarTime_t* GetCurrentSystemTime() {
+	return &CurrentTime;
+}
+
+Date_t* GetCurrentSystemDate() {
+	return &CurrentDate;
+}
+
+void SetSystemTime(CalendarTime_t* Time) {
+	CurrentTime.hour = Time->hour;
+	CurrentTime.minute = Time->minute;
+}
+
+void SetSystemDate(Date_t* Date) {
+	CurrentDate.year = Date->year;
+	CurrentDate.month = Date->month;
+	CurrentDate.day = Date->day;
+}

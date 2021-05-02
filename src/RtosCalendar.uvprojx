@@ -463,11 +463,6 @@
               <FilePath>.\FlashProgram.c</FilePath>
             </File>
             <File>
-              <FileName>Lab5.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Lab5.c</FilePath>
-            </File>
-            <File>
               <FileName>eFile.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\eFile.c</FilePath>
@@ -541,6 +536,26 @@
               <FileName>event_storage_lib.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\lib\event_storage\event_storage_lib.c</FilePath>
+            </File>
+            <File>
+              <FileName>set_time_view.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\set_time_view.c</FilePath>
+            </File>
+            <File>
+              <FileName>set_time_view_controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\set_time_view_controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>year_view_controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\year_view_controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>RtosCalendar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RtosCalendar.c</FilePath>
             </File>
           </Files>
         </Group>

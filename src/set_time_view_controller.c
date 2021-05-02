@@ -32,7 +32,8 @@ ViewController_t* UpdateSetTimeView(ViewController_t* self, uint8_t reload) {
           Date_t* date;
           CalendarTime_t* time;
           setTimeView->GetSelectedDateTime(setTimeView, &date, &time);
-         //  SetSystemTime();
+          SetSystemTime(time);
+          SetSystemDate(date);
           yearView->SetInfo(yearView, date);
 			 return self->_nextView;
    }

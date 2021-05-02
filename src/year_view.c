@@ -17,7 +17,7 @@ void DrawHeaderYearView(YearView_t *self)
 		DrawHLine(0, HEADER_HEIGHT, DISPLAY_MAX_X, LINE_COLOR);
 }
 
-void DrawYearMonth(YearView_t *self)
+void DrawYearMonthCurrDate(YearView_t *self)
 {
 		RgbColor SelectedColor = { 255, 0, 0 };
 
@@ -34,13 +34,21 @@ void DrawYearMonth(YearView_t *self)
 		color = (self->_selectedItem == MONTH) ? SelectedColor : TEXT_COLOR;
 		DrawString(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS + YEAR_CHAR_HEIGHT, monthStr, color);
 		free(monthStr);
+
+		FillRect(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS*2+ YEAR_CHAR_HEIGHT*2, DISPLAY_MAX_X, YEAR_CHAR_HEIGHT, BACKGROUND_COLOR);
+		char* currDateStr = (char*)calloc(25, sizeof(char));
+		Date_t* currDate = GetCurrentSystemDate();
+		sprintf(currDateStr, "today: %.2d/%.2d/%.4d",  currDate->day, currDate->month+1, currDate->year);
+		color = TEXT_COLOR;
+		DrawString(LEFT_CHAR_OFFSET_X_POS, HEADER_HEIGHT + TOP_CHAR_OFFSET_Y_POS*2 + YEAR_CHAR_HEIGHT*2, currDateStr, color);
+		free(currDateStr);
 }
 
 void ImplYearViewDraw(View_t *self)
 {
 		YearView_t* selfYearView = (YearView_t*)self;
 		DrawHeaderYearView(selfYearView);
-		DrawYearMonth(selfYearView);
+		DrawYearMonthCurrDate(selfYearView);
 }
 
 Date_t* ImplGetDateYearView(YearView_t *self)
