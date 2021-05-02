@@ -54,7 +54,7 @@ SchedulerView_t* SchedulerViewSingleton = null;
 void DrawHeaderSchedulerView(SchedulerView_t* self)
 {
 		char* headerStr = (char*)calloc(MAX_HEADER_CHAR_LEN, sizeof(char));
-		sprintf(headerStr, "%2d/%.2d/%.4d", self->_event.scheduledDay.day, self->_event.scheduledDay.month, self->_event.scheduledDay.year);
+		sprintf(headerStr, "%2d/%.2d/%.4d", self->_event.scheduledDay.day, self->_event.scheduledDay.month+1, self->_event.scheduledDay.year);
 		DrawString(LEFT_CHAR_OFFSET_X_POS, TOP_CHAR_OFFSET_Y_POS, headerStr, TEXT_COLOR);
 		DrawHLine(0, HEADER_HEIGHT, DISPLAY_MAX_X, LINE_COLOR);
 		free(headerStr);
