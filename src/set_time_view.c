@@ -161,8 +161,11 @@ void InitSetTimeView(SetTimeView_t* view)
             SetTimeViewSingleton->DecrementValue = ImplDecrementValue;
             SetTimeViewSingleton->NextElement = ImplNextItem;
             SetTimeViewSingleton->PrevElement = ImplPrevItem;
-            SetTimeViewSingleton->_selectedDate = { 1, January, 2020 };
-            SetTimeViewSingleton->_selectedTime = { 8, 0 };
+            SetTimeViewSingleton->_selectedDate.day = 1;
+						SetTimeViewSingleton->_selectedDate.month = January;
+						SetTimeViewSingleton->_selectedDate.year = 2020;
+            SetTimeViewSingleton->_selectedTime.hour = 8;
+						SetTimeViewSingleton->_selectedTime.minute = 0;
             SetTimeViewSingleton->_selectedItem = TIME_YEAR;
       }
 }

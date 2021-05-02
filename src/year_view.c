@@ -48,7 +48,7 @@ Date_t* ImplGetDateYearView(YearView_t *self)
 		return &self->_selectedDate;
 }
 
-void ImplIncrementValue(YearView_t *self)
+void ImplYearViewIncrementValue(YearView_t *self)
 {
 		if (self->_selectedItem == YEAR) {
 				self->_selectedDate.year++;
@@ -58,7 +58,7 @@ void ImplIncrementValue(YearView_t *self)
 		}
 }
 
-void ImplDecrementValue(YearView_t *self)
+void ImplYearViewDecrementValue(YearView_t *self)
 {
 		if (self->_selectedItem == YEAR) {
 				self->_selectedDate.year--;
@@ -94,11 +94,13 @@ void InitYearView(YearView_t* view)
 				YearViewSingleton->_super.Draw = ImplYearViewDraw;
 				YearViewSingleton->SetInfo = ImplSetDateYearView;
 				YearViewSingleton->GetSelectedDate = ImplGetDateYearView;
-				YearViewSingleton->IncrementValue = ImplIncrementValue;
-				YearViewSingleton->DecrementValue = ImplDecrementValue;
+				YearViewSingleton->IncrementValue = ImplYearViewIncrementValue;
+				YearViewSingleton->DecrementValue = ImplYearViewDecrementValue;
 				YearViewSingleton->SelectYear = ImplSelectYear;
 				YearViewSingleton->SelectMonth = ImplSelectMonth;
-				YearViewSingleton->_selectedDate = { 1, January, 2020 };
+				YearViewSingleton->_selectedDate.day = 1;
+				YearViewSingleton->_selectedDate.month = January;
+				YearViewSingleton->_selectedDate.year = 2020;
 				YearViewSingleton->_selectedItem = YEAR;
 		}
 }

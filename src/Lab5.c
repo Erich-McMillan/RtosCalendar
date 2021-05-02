@@ -6,6 +6,7 @@
 #include "Texas.h"
 #include "eFile.h"
 #include <tm4c123gh6pm.h>
+#include <os.h>
 
 #include <lib/date_time_lib.h>
 #include <lib/view_lib.h>
@@ -16,6 +17,10 @@
 #include <obj/day_view_controller.h>
 #include <obj/scheduler_view.h>
 #include <obj/scheduler_view_controller.h>
+#include <obj/year_view.h>
+#include <obj/year_view_controller.h>
+#include <obj/set_time_view.h>
+#include <obj/set_time_view_controller.h>
 #include <lib/graphics_lib.h>
 #include <lib/interface_lib.h>
 #include <lib/event_storage_lib.h>
@@ -23,8 +28,13 @@
 SchedulerViewController_t SchedulerViewController;
 DayViewController_t DayViewController;
 MonthViewController_t MonthViewController;
-ViewController_t* CurrentController = (ViewController_t*) &SchedulerViewController;
+YearViewController_t YearViewController;
+SetTimeViewController_t SetTimeViewController;
+ViewController_t* CurrentController = (ViewController_t*) &SetTimeViewController;
 Date_t dummyDate = { 4, April, 2021 };
+int32_t InputSema = 0;
+int32_t ReadyForInputSema = 0;
+ButtonId CurrentPressedButton = NONE;
 
 void SchedulerViewSetup() {
 		View_t* view;
@@ -61,7 +71,15 @@ void MonthViewSetup() {
 		view = GetMonthView();
 		((MonthView_t*)view)->SetMonthInfo((MonthView_t*)view, &startDate);
 
-		InitMonthViewController(&MonthViewController, (ViewController_t*) &DayViewController);
+		InitMonthViewController(&MonthViewController, (ViewController_t*) &YearViewController, (ViewController_t*) &DayViewController);
+}
+
+void YearViewSetup() {
+   InitYearViewController(&YearViewController, (ViewController_t*) &SetTimeViewController, (ViewController_t*) &MonthViewController);
+}
+
+void SetTimeViewSetup() {
+   InitSetTimeViewController(&SetTimeViewController, (ViewController_t*) &YearViewController);
 }
 
 void TestWriteToRom() {
@@ -85,43 +103,154 @@ void TestReadFromRom() {
 	return;
 }
 
+void CalendarThread() {
+   while(1) {
+		CurrentController = ControllerUpdate(CurrentController);
+      OS_Signal(&ReadyForInputSema);
+      OS_Wait(&InputSema);
+	}
+}
+
+void FilesystemThread() {
+   while(1) {
+
+   }
+}
+
+void EmptyThread() {
+   while(1) {
+      
+   }
+}
+
+uint8_t ImplIsUpButtonPressed(void)
+{
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(y>767)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+uint8_t ImplIsDownButtonPressed(void) {
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(y<256)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+uint8_t ImplIsLeftButtonPressed(void) {
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(x>75+(1023/2))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+uint8_t ImplIsRightButtonPressed(void) {
+	uint16_t x;
+	uint16_t y;
+	uint8_t sel;
+	BSP_Joystick_Input(&x, &y, &sel);
+	if(x<(1023/2)-75)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+uint8_t ImplIsSelectButtonPressed(void) {
+	return (0==BSP_Button1_Input());
+	//return 0;
+}
+uint8_t ImplIsBackButtonPressed(void) {
+	//return 0;
+	return (0==BSP_Button2_Input());
+}
+
+void InputThread() {
+   if (ReadyForInputSema == 1 && InputSema == 0) {
+      CurrentPressedButton = NONE;
+      if (ImplIsUpButtonPressed()) {
+         CurrentPressedButton = UP;
+      }
+      else if (ImplIsDownButtonPressed()) {
+         CurrentPressedButton = DOWN;
+      }
+      else if (ImplIsLeftButtonPressed()) {
+         CurrentPressedButton = LEFT;
+      }
+      else if (ImplIsRightButtonPressed()) {
+         CurrentPressedButton = RIGHT;
+      }
+      else if (ImplIsSelectButtonPressed()) {
+         CurrentPressedButton = SELECT;
+      }
+      else if (ImplIsBackButtonPressed()) {
+         CurrentPressedButton = BACK;
+      }
+
+      if (CurrentPressedButton != NONE) {
+				 ReadyForInputSema = 0;
+         OS_Signal(&InputSema);
+      }
+   }
+}
+
+void TimerThread() {
+
+}
+
 int main(void){
   volatile int i;
   DisableInterrupts();
   BSP_Clock_InitFastest();
   Profile_Init();               // initialize the 7 hardware profiling pins
   eDisk_Init(0);
-	OS_File_Format();
+  //OS_File_Format();
   MountDirectory();
-	BSP_Button1_Init();
+  BSP_Button1_Init();
   BSP_Button2_Init();
   BSP_Joystick_Init();
   BSP_LCD_Init();
   BSP_LCD_FillScreen(LCD_WHITE);
 
-	Date_t day = { 4, April, 2021 };
-	uint8_t numEvents;
-	ScheduledEvent_t* events[10] = {0};
+	SchedulerViewSetup();
+	DayViewSetup();
+	MonthViewSetup();
+	YearViewSetup();
+   SetTimeViewSetup();
 
-	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
-	
-	ScheduledEvent_t eventToAdd = { { 4, April, 2021 }, {8, 0, 30}, "30min event" };
+   OS_Init();
+   OS_AddThreads3(CalendarThread, FilesystemThread, EmptyThread);
+   OS_AddPeriodicEventThreads(InputThread, 10, TimerThread, 16000);
 
-	SaveEvent(&eventToAdd);
-
-	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
-	
-	DeleteEvent(&eventToAdd);
-	
-	LoadEventsForDay(&day, (ScheduledEvent_t**) &events, &numEvents);
-
-	// SchedulerViewSetup();
-	// DayViewSetup();
-	// MonthViewSetup();
-	
-	// while(1) {
-	// 	CurrentController = ControllerUpdate(CurrentController);
-	// }
+   OS_Launch(BSP_Clock_GetFreq()/100);
 }
 
 RgbColor BACKGROUND_COLOR = {255, 255, 255}; // white
@@ -160,74 +289,40 @@ void FillScreen(RgbColor fillColor) {
 
 //void SetPendingButtonPress(uint8_t buttonid);
 //void WaitForInput(void);
-uint8_t IsUpButtonPressed(void)
-{
-	uint16_t x;
-	uint16_t y;
-	uint8_t sel;
-	BSP_Joystick_Input(&x, &y, &sel);
-	if(y>767)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+uint8_t IsUpButtonPressed(void) {
+   uint8_t pressed = (CurrentPressedButton == UP);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
 
 uint8_t IsDownButtonPressed(void) {
-	uint16_t x;
-	uint16_t y;
-	uint8_t sel;
-	BSP_Joystick_Input(&x, &y, &sel);
-	if(y<256)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+   uint8_t pressed = (CurrentPressedButton == DOWN);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
 
 uint8_t IsLeftButtonPressed(void) {
-	uint16_t x;
-	uint16_t y;
-	uint8_t sel;
-	BSP_Joystick_Input(&x, &y, &sel);
-	if(x>75+(1023/2))
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+   uint8_t pressed = (CurrentPressedButton == LEFT);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
 
 uint8_t IsRightButtonPressed(void) {
-	uint16_t x;
-	uint16_t y;
-	uint8_t sel;
-	BSP_Joystick_Input(&x, &y, &sel);
-	if(x<(1023/2)-75)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+   uint8_t pressed = (CurrentPressedButton == RIGHT);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
 
 uint8_t IsSelectButtonPressed(void) {
-	return (0==BSP_Button1_Input());
-	//return 0;
+   uint8_t pressed = (CurrentPressedButton == SELECT);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
+
 uint8_t IsBackButtonPressed(void) {
-	//return 0;
-	return (0==BSP_Button2_Input());
+   uint8_t pressed = (CurrentPressedButton == BACK);
+   CurrentPressedButton = (pressed) ? NONE : CurrentPressedButton;
+   return pressed;
 }
 
 CalendarTime_t DummyTime = {8, 12};
