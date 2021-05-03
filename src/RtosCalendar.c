@@ -135,7 +135,7 @@ uint8_t ImplIsLeftButtonPressed(void) {
 	uint16_t y;
 	uint8_t sel;
 	BSP_Joystick_Input(&x, &y, &sel);
-	if(x>75+(1023/2))
+	if(x<(1023/2)-75)
 	{
 		return 1;
 	}
@@ -150,7 +150,7 @@ uint8_t ImplIsRightButtonPressed(void) {
 	uint16_t y;
 	uint8_t sel;
 	BSP_Joystick_Input(&x, &y, &sel);
-	if(x<(1023/2)-75)
+	if(x>75+(1023/2))
 	{
 		return 1;
 	}
