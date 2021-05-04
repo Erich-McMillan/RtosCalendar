@@ -2,6 +2,7 @@
 #include <eFile.h>
 #include <string.h>
 
+extern int32_t FileReadySema, FileWriteSema;
 #define EVENT_STORAGE_FILE_ID 0
 
 #pragma pack(1)
@@ -14,6 +15,7 @@ typedef struct _EventStorage {
 EventStorage eventStorage = {0};
 
 void LoadEventsForDay(Date_t* day, out ScheduledEvent_t** events, out uint8_t* numEvents) {
+    OS_Wait(&FileReadySema);
     MountDirectory();
     // note since this only uses first file sector only 512 bytes can be used total
     // don't really care for this demo, but if more event storage is needed then
@@ -37,13 +39,14 @@ void LoadEventsForDay(Date_t* day, out ScheduledEvent_t** events, out uint8_t* n
 }
 
 void SaveEvent(ScheduledEvent_t* event) {
+    OS_Wait(&FileReadySema);
     memcpy(&((ScheduledEvent_t*) eventStorage.Events)[eventStorage.NumEventsStored], (void*) event, sizeof(ScheduledEvent_t));
 		eventStorage.NumEventsStored++;
     OS_File_Format();
     MountDirectory();
 		uint8_t fileId = OS_File_New();
     OS_File_Append(EVENT_STORAGE_FILE_ID, (uint8_t*) &eventStorage);
-    OS_File_Flush();
+    OS_Signal(&FileWriteSema);
 }
 
 uint8_t CompareEvents(ScheduledEvent_t* a, ScheduledEvent_t* b) {
@@ -61,6 +64,8 @@ void DeleteEvent(ScheduledEvent_t* event) {
     uint8_t events[511] = {0};
     uint16_t bytePos = 0;
 
+    OS_Wait(&FileReadySema);
+
     for (uint8_t eventNum = 0; eventNum < eventStorage.NumEventsStored; eventNum++) {
         ScheduledEvent_t* currEvent = &((ScheduledEvent_t*) eventStorage.Events)[eventNum];
         if (CompareEvents(currEvent, event) == 1) {
@@ -75,5 +80,6 @@ void DeleteEvent(ScheduledEvent_t* event) {
     MountDirectory();
 		uint8_t fileId = OS_File_New();
     OS_File_Append(EVENT_STORAGE_FILE_ID, (uint8_t*) &eventStorage);
-    OS_File_Flush();
+    
+    OS_Signal(&FileWriteSema);
 }

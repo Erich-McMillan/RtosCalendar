@@ -34,6 +34,7 @@ ViewController_t* CurrentController = (ViewController_t*) &SetTimeViewController
 Date_t dummyDate = { 4, April, 2021 };
 int32_t RefreshSema = 0;
 int32_t ReadyForInputSema = 0;
+int32_t FileReadySema = 1;
 int32_t FileWriteSema = 0;
 ButtonId CurrentPressedButton = NONE;
 
@@ -90,6 +91,7 @@ void FilesystemThread() {
    while(1) {
       OS_Wait(&FileWriteSema);
       OS_File_Flush();
+		OS_Signal(&FileReadySema);
    }
 }
 
