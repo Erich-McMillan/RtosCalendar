@@ -91,7 +91,7 @@ void FilesystemThread() {
    while(1) {
       OS_Wait(&FileWriteSema);
       OS_File_Flush();
-		OS_Signal(&FileReadySema);
+		  OS_Signal(&FileReadySema);
    }
 }
 

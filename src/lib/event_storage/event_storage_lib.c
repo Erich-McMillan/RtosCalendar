@@ -1,6 +1,7 @@
 #include <lib/event_storage_lib.h>
 #include <eFile.h>
 #include <string.h>
+#include <os.h>
 
 extern int32_t FileReadySema, FileWriteSema;
 #define EVENT_STORAGE_FILE_ID 0
@@ -36,6 +37,8 @@ void LoadEventsForDay(Date_t* day, out ScheduledEvent_t** events, out uint8_t* n
             }
         }
     }
+		//OS_Signal(&FileReadySema);
+		OS_Signal(&FileWriteSema);
 }
 
 void SaveEvent(ScheduledEvent_t* event) {
@@ -50,7 +53,7 @@ void SaveEvent(ScheduledEvent_t* event) {
 }
 
 uint8_t CompareEvents(ScheduledEvent_t* a, ScheduledEvent_t* b) {
-	if (strcmp(a->eventName, b->eventName)) {
+	if (strcmp(a->eventName, b->eventName) == 0) {
 		if (a->scheduledDay.day == b->scheduledDay.day && a->scheduledDay.month == b->scheduledDay.month && a->scheduledDay.year == b->scheduledDay.year) {
 			if (a->scheduledTime.durationMins == b->scheduledTime.durationMins && a->scheduledTime.hour == b->scheduledTime.hour && a->scheduledTime.minute == b->scheduledTime.minute) {
 				return 1;
@@ -63,18 +66,21 @@ uint8_t CompareEvents(ScheduledEvent_t* a, ScheduledEvent_t* b) {
 void DeleteEvent(ScheduledEvent_t* event) {
     uint8_t events[511] = {0};
     uint16_t bytePos = 0;
+		uint8_t numEventsAfterDelete = 0;
 
     OS_Wait(&FileReadySema);
 
     for (uint8_t eventNum = 0; eventNum < eventStorage.NumEventsStored; eventNum++) {
         ScheduledEvent_t* currEvent = &((ScheduledEvent_t*) eventStorage.Events)[eventNum];
-        if (CompareEvents(currEvent, event) == 1) {
+        if (CompareEvents(currEvent, event) != 1) {
             memcpy(&events[bytePos], currEvent, sizeof(ScheduledEvent_t));
             bytePos += sizeof(ScheduledEvent_t);
+						numEventsAfterDelete ++;
         }
     }
 
     memcpy(eventStorage.Events, events, sizeof(events));
+		eventStorage.NumEventsStored = numEventsAfterDelete;
 
     OS_File_Format();
     MountDirectory();

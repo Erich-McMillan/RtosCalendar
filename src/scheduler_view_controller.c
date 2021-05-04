@@ -9,6 +9,7 @@ ViewController_t* UpdateSchedulerView(ViewController_t* self, uint8_t reload) {
 
 	 if (reload) {
 			 // SchedulerView should present a reset interface?
+		   view->_focused = 0;
 			 view->_state = EDITING;
 	 }
 
@@ -44,13 +45,16 @@ ViewController_t* UpdateSchedulerView(ViewController_t* self, uint8_t reload) {
    if (view->_state == SAVED) {
       // perform save object here if needed
 			 SaveEvent(&view->_event);
+			 view->_focused = 0;
        return self->_prevView;
    }
 	 if (view->_state == DELETED) {
 			 DeleteEvent(&view->_event);
+		   view->_focused = 0;
 			 return self->_prevView;
 	 }
 	 if (view->_state == CANCELED) {
+		   view->_focused = 0;
 		   return self->_prevView;
 	 }
 
